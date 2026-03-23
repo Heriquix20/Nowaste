@@ -4,7 +4,6 @@ import A3.project.noWaste.domain.User;
 import A3.project.noWaste.domain.dto.UserDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 
@@ -16,6 +15,6 @@ public interface UserService {
 
     User update(UserDTO obj);
 
-    boolean delete(Integer id);
+    void delete(Integer Id);
 
 }

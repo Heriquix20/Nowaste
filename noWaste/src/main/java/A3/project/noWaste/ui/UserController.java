@@ -60,12 +60,9 @@ public class UserController {
 
 
     // delete user
-    @DeleteMapping("/{Id}")
-    public ResponseEntity deletarUsuario(@PathVariable Integer Id) throws UserNotFoundException {
-        boolean existe = service.delete(Id);
-        if (!existe) {
-            throw new UserNotFoundException("Usuário não encontrado");
-        }
-        return ResponseEntity.status(204).build();
+    @DeleteMapping(value = "/{Id}")
+    public ResponseEntity delete(@PathVariable Integer Id) {
+        service.delete(Id);
+        return ResponseEntity.noContent().build();
     }
 }

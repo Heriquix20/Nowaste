@@ -53,12 +53,9 @@ public class UserImpl implements UserService {
 
     // delete User
     @Override
-    public boolean delete(Integer id) {
-        if (!repository.existsById(id)) {
-            return false;
-        }
+    public void delete(Integer id) {
+        findById(id);
         repository.deleteById(id);
-        return true;
     }
 
     // email verification
