@@ -1,7 +1,16 @@
 package A3.project.noWaste.config;
 
-import lombok.Builder;
+import lombok.*;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public record JWTUserData(Integer userId, String email) {
+public class JWTUserData {
+
+    private Integer userId;
+
+    private String email;
+
 }

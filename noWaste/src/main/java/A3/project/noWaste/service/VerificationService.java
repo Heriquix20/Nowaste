@@ -1,11 +1,14 @@
 package A3.project.noWaste.service;
 
+import A3.project.noWaste.config.JWTUserData;
 import A3.project.noWaste.config.TokenConfig;
 import A3.project.noWaste.domain.User;
 import A3.project.noWaste.exceptions.ObjectNotFoundException;
 import A3.project.noWaste.infra.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -33,16 +36,14 @@ public class VerificationService {
         }
     }
 
-    // Pegar id do usuario logado
     public Integer pegarIdUsuario() {
-        var subject = tokenConfig.getSubject(processarComAuthorization());
-        Optional<User> user = userRepository.findByEmail(subject);
-        if (user.isPresent()) {
-            var  userId = user.get().getId();
-            return userId;
-        } else {
-            throw new ObjectNotFoundException("Valor do userId é nulo");
-        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JWTUserData userData = (JWTUserData) auth.getPrincipal();
+
+        return userRepository.findByEmail(userData.getEmail())
+                .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"))
+                .getId();
     }
 
     // verificar usuario

@@ -20,6 +20,7 @@ public class TokenConfig {
     public String generateToken(User user) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         return JWT.create()
+                .withIssuer("NoWaste")
                 .withClaim("userId", user.getId())
                 .withSubject(user.getEmail())
                 .withExpiresAt(Instant.now().plusSeconds(99999))
@@ -27,12 +28,13 @@ public class TokenConfig {
                 .sign(algorithm);
     }
 
+
     // Pegar o Objeto dentro de um token
     public String getSubject(String tokenJWT) {
         try {
             var algoritmo = Algorithm.HMAC256(secret);
             return JWT.require(algoritmo)
-                    .withIssuer("Project_AO3-API-MOVIES")
+                    .withIssuer("NoWaste")
                     .build()
                     .verify(tokenJWT)
                     .getSubject();
@@ -43,17 +45,14 @@ public class TokenConfig {
 
 
     public Optional<JWTUserData> validateToken(String token) {
-
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             DecodedJWT decoded = JWT.require(algorithm)
                     .build().verify(token);
-
             return Optional.of(JWTUserData.builder()
                     .userId(Math.toIntExact(decoded.getClaim("userId").asLong()))
                     .email(decoded.getSubject())
                     .build());
-
         } catch (JWTVerificationException ex) {
             return Optional.empty();
         }
