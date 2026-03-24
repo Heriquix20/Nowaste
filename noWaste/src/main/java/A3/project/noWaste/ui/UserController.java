@@ -3,6 +3,7 @@ package A3.project.noWaste.ui;
 import A3.project.noWaste.domain.User;
 import A3.project.noWaste.dto.UserDTO;
 import A3.project.noWaste.service.UserService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class UserController {
 
     // add user
     @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody UserDTO obj) {
+    public ResponseEntity<UserDTO> create(@RequestBody @Valid UserDTO obj) {
         User newObj = service.create(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(newObj.getId()).toUri();

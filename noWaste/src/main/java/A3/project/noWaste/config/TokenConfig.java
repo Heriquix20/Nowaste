@@ -27,6 +27,20 @@ public class TokenConfig {
                 .sign(algorithm);
     }
 
+    // Pegar o Objeto dentro de um token
+    public String getSubject(String tokenJWT) {
+        try {
+            var algoritmo = Algorithm.HMAC256(secret);
+            return JWT.require(algoritmo)
+                    .withIssuer("Project_AO3-API-MOVIES")
+                    .build()
+                    .verify(tokenJWT)
+                    .getSubject();
+        } catch (JWTVerificationException exception){
+            throw new RuntimeException("Token JWT inválido ou expirado");
+        }
+    }
+
 
     public Optional<JWTUserData> validateToken(String token) {
 
