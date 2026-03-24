@@ -20,9 +20,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
+    @Column(nullable = false)
     private String name;
-    private String brand;
+
+    @Column(nullable = false)
     private String category;
+
+    private String brand;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockItem> stockItems = new ArrayList<>();

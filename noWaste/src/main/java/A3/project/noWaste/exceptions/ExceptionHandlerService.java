@@ -1,4 +1,4 @@
-package A3.project.noWaste.service.exceptions;
+package A3.project.noWaste.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

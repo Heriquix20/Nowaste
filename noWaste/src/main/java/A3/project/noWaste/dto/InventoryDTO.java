@@ -1,4 +1,4 @@
-package A3.project.noWaste.domain.dto;
+package A3.project.noWaste.dto;
 
 
 import jakarta.validation.constraints.NotBlank;

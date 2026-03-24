@@ -1,7 +1,7 @@
 package A3.project.noWaste.ui;
 
 import A3.project.noWaste.domain.Product;
-import A3.project.noWaste.domain.dto.ProductDTO;
+import A3.project.noWaste.dto.ProductDTO;
 import A3.project.noWaste.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

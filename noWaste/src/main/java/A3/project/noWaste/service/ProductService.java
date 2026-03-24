@@ -2,7 +2,7 @@ package A3.project.noWaste.service;
 
 
 import A3.project.noWaste.domain.Product;
-import A3.project.noWaste.domain.dto.ProductDTO;
+import A3.project.noWaste.dto.ProductDTO;
 
 import java.util.List;
 

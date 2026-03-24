@@ -1,12 +1,12 @@
 package A3.project.noWaste.service.impl;
 
 import A3.project.noWaste.domain.Inventory;
-import A3.project.noWaste.domain.dto.InventoryDTO;
+import A3.project.noWaste.dto.InventoryDTO;
 import A3.project.noWaste.infra.InventoryRepository;
 import A3.project.noWaste.infra.UserRepository;
 import A3.project.noWaste.service.InventoryService;
-import A3.project.noWaste.service.exceptions.DataIntegratyViolationException;
-import A3.project.noWaste.service.exceptions.ObjectNotFoundException;
+import A3.project.noWaste.exceptions.DataIntegratyViolationException;
+import A3.project.noWaste.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;

@@ -1,7 +1,7 @@
 package A3.project.noWaste.ui;
 
 import A3.project.noWaste.domain.Inventory;
-import A3.project.noWaste.domain.dto.InventoryDTO;
+import A3.project.noWaste.dto.InventoryDTO;
 import A3.project.noWaste.service.InventoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
