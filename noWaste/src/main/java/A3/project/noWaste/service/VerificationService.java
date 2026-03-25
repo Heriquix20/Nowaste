@@ -5,52 +5,42 @@ import A3.project.noWaste.config.TokenConfig;
 import A3.project.noWaste.domain.User;
 import A3.project.noWaste.exceptions.ObjectNotFoundException;
 import A3.project.noWaste.infra.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Optional;
 
 @Service
 public class VerificationService {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
     @Autowired
-    private TokenConfig tokenConfig;
+    private final TokenConfig tokenConfig;
 
 
-    // Pegar token do cabeçalho Authorization
-    public String processarComAuthorization() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String authorizationHeader = request.getHeader("Authorization");
-
-        if (authorizationHeader != null) {
-            return authorizationHeader.replace("Bearer ", "");
-        } else {
-            throw new RuntimeException("Valor do cabeçalho é nulo");
-        }
+    public VerificationService(UserRepository userRepository, TokenConfig tokenConfig) {
+        this.userRepository = userRepository;
+        this.tokenConfig = tokenConfig;
     }
 
-    public Integer pegarIdUsuario() {
 
+    public Integer getUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        JWTUserData userData = (JWTUserData) auth.getPrincipal();
 
-        return userRepository.findByEmail(userData.getEmail())
-                .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"))
-                .getId();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ObjectNotFoundException("Usuário não autenticado");
+        }
+        JWTUserData userData = (JWTUserData) auth.getPrincipal();
+        return userData.getUserId();
     }
 
-    // verificar usuario
     public User verifyUser() {
-        Integer userId = pegarIdUsuario();
-        User user = userRepository.findById(userId)
+        Integer userId = getUserId();
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));
-        return user;
     }
 }
+

@@ -45,7 +45,7 @@ public class UserController {
     }
 
     // update user
-    @PutMapping(value = "/{Id}")
+    @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Integer Id, @RequestBody UserDTO obj) {
         obj.setId(Id);
         User newObj = service.update(obj);
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     // delete user
-    @DeleteMapping(value = "/{Id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity delete(@PathVariable Integer Id) {
         service.delete(Id);
         return ResponseEntity.noContent().build();
