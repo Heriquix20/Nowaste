@@ -7,13 +7,14 @@ import java.util.List;
 
 public interface ProductService {
 
-    Product findById(Integer id);
+    Product findById(Integer inventoryId, Integer productId);
 
     List<Product> findAllByInventory(Integer inventoryId);
 
     Product create(Integer inventoryId, ProductDTO obj);
 
-    Product update(Integer id, ProductDTO obj);
+    Product update(Integer inventoryId, Integer productId, ProductDTO obj);
 
-    void delete(Integer id);
+    void delete(Integer inventoryId, Integer productId);
 }
+

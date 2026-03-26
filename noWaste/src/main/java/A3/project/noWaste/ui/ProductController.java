@@ -35,9 +35,10 @@ public class ProductController {
         return ResponseEntity.ok(listDTO);
     }
 
-    @GetMapping("/products/{id}")
-    public ResponseEntity<ProductDTO> findById(@PathVariable Integer id) {
-        Product product = service.findById(id);
+    @GetMapping("/inventories/{inventoryId}/products/{productId}")
+    public ResponseEntity<ProductDTO> findById(@PathVariable Integer inventoryId,
+                                               @PathVariable Integer productId) {
+        Product product = service.findById(inventoryId, productId);
         return ResponseEntity.ok(mapper.map(product, ProductDTO.class));
     }
 
@@ -56,15 +57,17 @@ public class ProductController {
         return ResponseEntity.created(uri).body(mapper.map(newProduct, ProductDTO.class));
     }
 
-    @PutMapping("/products/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable Integer id, @Valid @RequestBody ProductDTO obj) {
-        Product updated = service.update(id, obj);
+    @PutMapping("/inventories/{inventoryId}/products/{productId}")
+    public ResponseEntity<ProductDTO> update(@PathVariable Integer inventoryId, @PathVariable Integer productId,
+                                             @Valid @RequestBody ProductDTO obj) {
+        Product updated = service.update(inventoryId, productId, obj);
         return ResponseEntity.ok(mapper.map(updated, ProductDTO.class));
     }
 
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        service.delete(id);
+    @DeleteMapping("/inventories/{inventoryId}/products/{productId}")
+    public ResponseEntity<Void> delete(@PathVariable Integer inventoryId, @PathVariable Integer productId) {
+        service.delete(inventoryId, productId);
         return ResponseEntity.noContent().build();
     }
+
 }

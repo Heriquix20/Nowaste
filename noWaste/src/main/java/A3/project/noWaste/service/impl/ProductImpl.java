@@ -32,19 +32,11 @@ public class ProductImpl implements ProductService {
     }
 
 
-
     @Override
-    public Product findById(Integer id) {
-        Integer userId = verificationService.getUserId();
-
-        Product product = repository.findById(id)
+    public Product findById(Integer inventoryId, Integer productId) {
+        Inventory inventory = findInventoryByUser(inventoryId);
+        return repository.findByIdAndInventoryId(productId, inventory.getId())
                 .orElseThrow(() -> new ObjectNotFoundException("Produto nao encontrado"));
-
-        if (!product.getInventory().getUser().getId().equals(userId)) {
-            throw new DataIntegratyViolationException("Acesso negado");
-        }
-
-        return product;
     }
 
     @Override
@@ -67,17 +59,10 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public Product update(Integer id, ProductDTO obj) {
-        Integer userId = verificationService.getUserId();
+    public Product update(Integer inventoryId, Integer productId, ProductDTO obj) {
+        Product product = findById(inventoryId, productId);
 
-        Product product = repository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Produto nao encontrado"));
-
-        if (!product.getInventory().getUser().getId().equals(userId)) {
-            throw new DataIntegratyViolationException("Acesso negado");
-        }
-
-        checkProductName(obj.getName(), product.getInventory().getId(), product.getId());
+        checkProductName(obj.getName(), inventoryId, product.getId());
 
         product.setName(obj.getName());
         product.setWeight(obj.getWeight());
@@ -88,10 +73,11 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public void delete(Integer id) {
-        Product product = findById(id);
+    public void delete(Integer inventoryId, Integer productId) {
+        Product product = findById(inventoryId, productId);
         repository.delete(product);
     }
+
 
 
 
