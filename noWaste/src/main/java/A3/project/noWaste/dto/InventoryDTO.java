@@ -16,4 +16,8 @@ public class InventoryDTO {
 
     @NotBlank(message = "O nome do inventario e obrigatorio")
     private String name;
+
+    private String description;
+
+    private String location;
 }

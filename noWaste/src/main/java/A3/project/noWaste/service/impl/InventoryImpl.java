@@ -32,7 +32,7 @@ public class InventoryImpl implements InventoryService {
     public Inventory findById(Integer id) {
         Integer userId = verificationService.getUserId();
         return repository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ObjectNotFoundException("Inventario nao encontrado"));
+                .orElseThrow(() -> new ObjectNotFoundException("Inventário não encontrado"));
     }
 
     @Override
@@ -62,6 +62,8 @@ public class InventoryImpl implements InventoryService {
 
         checkInventoryName(obj);
         upInventory.setName(obj.getName());
+        upInventory.setDescription(obj.getDescription());
+        upInventory.setLocation(obj.getLocation());
 
         return repository.save(upInventory);
     }
@@ -77,6 +79,8 @@ public class InventoryImpl implements InventoryService {
     }
 
 
+
+
     private void checkInventoryName(InventoryDTO obj) {
         Integer userId = verificationService.getUserId();
         Optional<Inventory> inv = repository.findByUserId(userId).stream()
@@ -84,7 +88,7 @@ public class InventoryImpl implements InventoryService {
                         && !i.getId().equals(obj.getId()))
                 .findFirst();
         if (inv.isPresent()) {
-            throw new DataIntegratyViolationException("Inventario com esse nome ja existe para o usuario");
+            throw new DataIntegratyViolationException("Inventário com esse nome já existe para este usuário");
         }
     }
 }
