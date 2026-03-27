@@ -3,7 +3,7 @@ package A3.project.noWaste.service;
 import A3.project.noWaste.config.JWTUserData;
 import A3.project.noWaste.config.TokenConfig;
 import A3.project.noWaste.domain.User;
-import A3.project.noWaste.exceptions.ObjectNotFoundException;
+import A3.project.noWaste.exceptions.UserNotFoundException;
 import A3.project.noWaste.infra.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,7 +31,7 @@ public class VerificationService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || auth.getPrincipal() == null) {
-            throw new ObjectNotFoundException("Usuário não autenticado");
+            throw new UserNotFoundException("Usuário não autenticado");
         }
         JWTUserData userData = (JWTUserData) auth.getPrincipal();
         return userData.getUserId();
@@ -40,7 +40,7 @@ public class VerificationService {
     public User verifyUser() {
         Integer userId = getUserId();
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
     }
 }
 
