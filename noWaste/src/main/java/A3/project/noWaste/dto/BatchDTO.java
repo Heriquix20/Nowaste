@@ -19,7 +19,7 @@ public class BatchDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O codigo do lote e obrigatorio")
+    @NotBlank(message = "O código do lote e obrigatório")
     private String code;
 
     @NotNull(message = "A quantidade e obrigatoria")
