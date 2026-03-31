@@ -1,10 +1,11 @@
-# 📄 Nowaste
+# 📦 Nowaste
 
-## 📌 Sobre
+## 🧾 Sobre o projeto
 
-O Nowaste é um sistema desenvolvido em Java com foco no controle de validade de produtos em estoque, voltado para empresas como supermercados.
+O Nowaste é um sistema em Java focado no controle de validade de produtos em estoque, utilizando gerenciamento por lotes.
+A proposta é permitir que empresas acompanhem com mais precisão as datas de validade dos produtos, reduzindo desperdícios e prejuízos.
 
-O diferencial do sistema é que o controle é feito por lote, permitindo que um mesmo produto tenha múltiplas datas de validade, tornando o gerenciamento mais preciso e evitando desperdícios.
+O sistema está sendo desenvolvido de forma incremental utilizando Scrum, evoluindo a cada sprint com novas funcionalidades e melhorias.
 
 ---
 
@@ -12,40 +13,71 @@ O diferencial do sistema é que o controle é feito por lote, permitindo que um 
 
 Empresas que trabalham com estoque enfrentam dificuldades como:
 
-- Controlar validade de produtos por lote  
-- Identificar produtos próximos do vencimento  
-- Evitar perdas e prejuízos  
+* controle de validade por lote
+* identificação de produtos próximos do vencimento
+* desperdício de produtos
 
 ---
 
-## 💡 Solução
+## 👥 Público-alvo
 
-O Nowaste resolve isso através de:
-
-- Cadastro de produtos organizados por categoria  
-- Cadastro de lotes com validade individual  
-- Análise automática da validade dos lotes  
+* supermercados
+* mercearias
+* qualquer negócio com controle de estoque por validade
 
 ---
 
-## ⚙️ Funcionalidades (Sprint 0)
+## ⚙️ Funcionalidades a serem implementadas:
 
-- Cadastro de produtos  
-- Cadastro de lotes com data de validade  
-- Associação entre produto e lote  
-- Organização por categoria  
-- Verificação de validade dos lotes  
+### ✔️ Sprint 0 (Atual)
+
+* Cadastro de produtos
+* Aba de Login
+* Cadastro de lotes
+* Associação entre produto e lote
+* Estrutura inicial do projeto
+* Organização em camadas (domain, service, repository, ui)
 
 ---
 
-## 🧠 Regras de negócio
+### 🚧 Próximas sprints
 
-- Um produto pode ter vários lotes  
-- Cada lote possui sua própria data de validade  
-- O sistema define automaticamente o status do lote:
-  - VÁLIDO  
-  - PRÓXIMO DO VENCIMENTO  
-  - VENCIDO  
+#### Sprint 1 (MVP)
+
+* Listagem de produtos
+* Listagem de lotes
+* Primeiros testes automatizados
+
+#### Sprint 2
+
+* Identificação de produtos próximos do vencimento
+* Produtos que vencem no mês
+* Refinamento das regras de negócio
+
+#### Sprint 3
+
+* Testes completos
+* Melhorias de usabilidade
+* Documentação final
+* Apresentação
+
+---
+
+## 🛠️ Tecnologias utilizadas
+
+* Java
+* Estrutura em camadas (Domain, Service, Repository, UI)
+* JUnit (planejado)
+
+---
+
+## ▶️ Como executar
+
+```bash
+git clone https://github.com/gabszinn/Nowaste.git
+```
+
+Abrir na IDE (IntelliJ ou Eclipse) e executar a classe principal.
 
 ---
 
@@ -53,85 +85,40 @@ O Nowaste resolve isso através de:
 
 ```bash
 src/
-├── domain/
-├── service/
-└── ui/
+ └── main/java/
+     ├── domain
+     ├── service
+     ├── repository
+     └── ui
 ```
-📦 Principais classes
 
-📂 Domain
-Produto
+---
 
-Lote
+## 🧪 Como rodar os testes
 
-Fornecedor
+```bash
+# ainda em desenvolvimento
+```
 
-StatusProduto (enum)
+Testes serão implementados a partir da Sprint 1 utilizando JUnit.
 
-⚙️ Service
+---
 
-ProdutoService
+## 👨‍💻 Integrantes e papéis (Sprint 0)
 
-LoteService
+* Gabriel Felipe — Product Owner/backend
+* Isadora Rodrigues — backend
+* Wesley Carvalho — backend
+* Henrique Cezar — backend
 
-💾 Infra
+---
 
-ProdutoRepositoryMemoria
+## 📌 Status do projeto
 
-LoteRepositoryMemoria
+🚧 Em desenvolvimento (Sprint 0 concluída)
 
-🖥️ UI
+---
 
-ConsoleUI
+## 📄 Licença
 
-Menu
-
-▶️ Como executar
-
-git clone https://github.com/gabszinn/Nowaste.git
-
-Abrir na IDE (IntelliJ ou Eclipse) e executar a classe principal.
-
-🧪 Testes:
-
-🚧 Ainda em desenvolvimento
-
-Planejado:
-
-Testes unitários com JUnit
-
-Testes BDD com Cucumber
-
-📊 Status do projeto:
-
-✔ Sprint 0 concluída
-
-Estrutura inicial criada
-
-Primeira funcionalidade implementada
-
-🚀 Próximos passos
-
-Listagem de lotes
-
-Produtos que vencem no mês
-
-Produtos próximos do vencimento
-
-Alertas
-
-Testes automatizados
-
-📌 Observação
-
-As funcionalidades detalhadas estão disponíveis no backlog do projeto (GitHub Issues).
-
-👥 Integrantes
-
-Gabriel Felipe
-
-Isadora Rodrigues
-
-Wesley Carvalho
-
-Henrique Cezar
+GPL-3.0
