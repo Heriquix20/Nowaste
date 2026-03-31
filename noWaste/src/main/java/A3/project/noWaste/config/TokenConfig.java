@@ -14,7 +14,7 @@ import java.util.Optional;
 @Component
 public class TokenConfig {
 
-    private String secret = "secret";
+    private String secret = System.getenv("TOKEN_SECRET");
 
 
     public String generateToken(User user) {
