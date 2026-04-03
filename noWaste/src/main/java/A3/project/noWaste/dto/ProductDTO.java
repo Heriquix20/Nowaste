@@ -15,14 +15,15 @@ public class ProductDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O nome do produto e obrigatorio")
+    @NotBlank(message = "O nome do produto é obrigatório")
     private String name;
 
-    @NotNull(message = "O peso do produto e obrigatorio")
+    @NotNull(message = "O peso do produto é obrigatório")
     private Double weight;
 
-    @NotBlank(message = "A categoria do produto e obrigatoria")
+    @NotBlank(message = "A categoria do produto é obrigatória")
     private String category;
 
+    @NotBlank(message = "A marca do produto é obrigatória")
     private String brand;
 }

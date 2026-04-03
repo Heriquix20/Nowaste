@@ -17,11 +17,12 @@ public class InventoryDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O nome do inventario e obrigatorio")
+    @NotBlank(message = "O nome do inventário é obrigatório")
     private String name;
 
     private String description;
 
+    @NotBlank(message = "A localização é obrigatória")
     private String location;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
