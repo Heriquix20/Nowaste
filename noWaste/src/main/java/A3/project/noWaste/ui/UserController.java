@@ -46,7 +46,7 @@ public class UserController {
 
     // update user
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Integer Id, @RequestBody UserDTO obj) {
+    public ResponseEntity<UserDTO> update(@PathVariable Integer Id, @RequestBody @Valid UserDTO obj) {
         obj.setId(Id);
         User newObj = service.update(obj);
         return ResponseEntity.ok().body(mapper.map(newObj, UserDTO.class));

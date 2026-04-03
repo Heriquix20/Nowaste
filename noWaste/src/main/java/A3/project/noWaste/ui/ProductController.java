@@ -46,9 +46,8 @@ public class ProductController {
 
     // create product
     @PostMapping("/inventories/{inventoryId}/products")
-    public ResponseEntity<ProductDTO> create(
-            @PathVariable Integer inventoryId,
-            @Valid @RequestBody ProductDTO obj) {
+    public ResponseEntity<ProductDTO> create(@PathVariable Integer inventoryId,
+                                             @Valid @RequestBody ProductDTO obj) {
 
         Product newProduct = service.create(inventoryId, obj);
 
