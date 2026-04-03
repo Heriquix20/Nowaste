@@ -43,10 +43,33 @@ public class Batch {
     @Transient
     private Double totalWeight;
 
+
+
     public Double getTotalWeight() {
         if (product == null || product.getWeight() == null || quantity == null) {
             return 0.0;
         }
         return product.getWeight() * quantity;
+    }
+
+    public Long getDaysToExpire() {
+        if (expirationDate == null) {
+            return null;
+        }
+        return java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), expirationDate);
+    }
+
+    public String getStatus() {
+        if (expirationDate == null) {
+            return "UNKNOWN";
+        }
+        java.time.LocalDate today = java.time.LocalDate.now();
+        if (expirationDate.isBefore(today)) {
+            return "EXPIRED";
+        }
+        if (!expirationDate.isAfter(today.plusDays(7))) {
+            return "WARNING";
+        }
+        return "OK";
     }
 }
