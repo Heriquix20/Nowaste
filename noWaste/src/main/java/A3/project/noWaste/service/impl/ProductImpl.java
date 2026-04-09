@@ -40,10 +40,19 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public List<Product> findAllByInventory(Integer inventoryId) {
+    public List<Product> findAllByInventory(Integer inventoryId, String name) {
         Inventory inventory = findInventoryByUser(inventoryId);
-        return repository.findByInventoryId(inventory.getId());
+        List<Product> products = repository.findByInventoryId(inventory.getId());
+
+        if (name != null && !name.isBlank()) {
+            products = products.stream()
+                    .filter(product -> product.getName() != null
+                            && product.getName().toLowerCase().contains(name.toLowerCase()))
+                    .toList();
+        }
+        return products;
     }
+
 
     @Override
     public Product create(Integer inventoryId, ProductDTO obj) {
