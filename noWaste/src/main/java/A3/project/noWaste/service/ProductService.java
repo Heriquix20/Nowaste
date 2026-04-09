@@ -9,7 +9,7 @@ public interface ProductService {
 
     Product findById(Integer inventoryId, Integer productId);
 
-    List<Product> findAllByInventory(Integer inventoryId);
+    List<Product> findAllByInventory(Integer inventoryId, String name);
 
     Product create(Integer inventoryId, ProductDTO obj);
 
