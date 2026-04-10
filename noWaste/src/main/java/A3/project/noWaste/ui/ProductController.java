@@ -25,7 +25,7 @@ public class ProductController {
         this.mapper = mapper;
     }
 
-    // get product list
+    // listar produtos e filtrar por nome, categoria, marca, peso e ordenação por peso
     @GetMapping("/inventories/{inventoryId}/products")
     public ResponseEntity<List<ProductDTO>> findAllByInventory(
             @PathVariable Integer inventoryId,
@@ -51,7 +51,7 @@ public class ProductController {
         return ResponseEntity.ok(listDTO);
     }
 
-    // get a product
+    // produto especifico
     @GetMapping("/inventories/{inventoryId}/products/{productId}")
     public ResponseEntity<ProductDTO> findById(@PathVariable Integer inventoryId,
                                                @PathVariable Integer productId) {
@@ -59,7 +59,7 @@ public class ProductController {
         return ResponseEntity.ok(mapper.map(product, ProductDTO.class));
     }
 
-    // create product
+    // criar produto
     @PostMapping("/inventories/{inventoryId}/products")
     public ResponseEntity<ProductDTO> create(@PathVariable Integer inventoryId,
                                              @Valid @RequestBody ProductDTO obj) {
@@ -71,7 +71,7 @@ public class ProductController {
         return ResponseEntity.created(uri).body(mapper.map(newProduct, ProductDTO.class));
     }
 
-    // update product
+    // atualizar produto
     @PutMapping("/inventories/{inventoryId}/products/{productId}")
     public ResponseEntity<ProductDTO> update(@PathVariable Integer inventoryId, @PathVariable Integer productId,
                                              @Valid @RequestBody ProductDTO obj) {
@@ -79,7 +79,7 @@ public class ProductController {
         return ResponseEntity.ok(mapper.map(updated, ProductDTO.class));
     }
 
-    //delete product
+    //deletar produto
     @DeleteMapping("/inventories/{inventoryId}/products/{productId}")
     public ResponseEntity<Void> delete(@PathVariable Integer inventoryId, @PathVariable Integer productId) {
         service.delete(inventoryId, productId);

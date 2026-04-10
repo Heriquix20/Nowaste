@@ -25,7 +25,6 @@ public class UserController {
     @Autowired
     private ModelMapper mapper;
 
-
     // get users
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {

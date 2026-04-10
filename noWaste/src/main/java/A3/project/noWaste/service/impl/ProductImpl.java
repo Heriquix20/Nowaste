@@ -31,6 +31,7 @@ public class ProductImpl implements ProductService {
         this.mapper = mapper;
     }
 
+
     // produto especifio
     @Override
     public Product findById(Integer inventoryId, Integer productId) {
@@ -39,11 +40,12 @@ public class ProductImpl implements ProductService {
                 .orElseThrow(() -> new ObjectNotFoundException("Produto nao encontrado"));
     }
 
-    // retornar produtos e filtrar por nome, categoria, marca, peso e ordenação por peso
+    // listar produtos e filtrar por nome, categoria, marca, peso e ordenação por peso
     @Override
     public List<Product> findAllByInventory(Integer inventoryId, String name, String category,
                                             String brand, Double minWeight,
                                             Double maxWeight, String sortWeight) {
+
         Inventory inventory = findInventoryByUser(inventoryId);
         List<Product> products = repository.findByInventoryId(inventory.getId());
 
@@ -127,6 +129,7 @@ public class ProductImpl implements ProductService {
 
 
     // metodos de verificacao
+    // encontrar inventario a partir de um usuario
     private Inventory findInventoryByUser(Integer inventoryId) {
         Integer userId = verificationService.getUserId();
 
@@ -134,6 +137,7 @@ public class ProductImpl implements ProductService {
                 .orElseThrow(() -> new ObjectNotFoundException("Inventario nao encontrado"));
     }
 
+    // checar nomes repetidos
     private void checkProductName(String name, Integer inventoryId, Integer productId) {
         List<Product> products = repository.findByInventoryId(inventoryId);
 

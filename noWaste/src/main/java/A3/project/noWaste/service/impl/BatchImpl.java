@@ -96,6 +96,7 @@ public class BatchImpl implements BatchService {
         return batches;
     }
 
+    // criar um lote
     @Override
     public Batch create(Integer inventoryId, Integer productId, BatchDTO obj) {
         Product product = findProductByInventory(inventoryId, productId);
@@ -109,6 +110,7 @@ public class BatchImpl implements BatchService {
         return repository.save(batch);
     }
 
+    // atualizar um lote
     @Override
     public Batch update(Integer inventoryId, Integer productId, Integer batchId, BatchDTO obj) {
         Batch batch = findById(inventoryId, productId, batchId);
@@ -122,13 +124,15 @@ public class BatchImpl implements BatchService {
         return repository.save(batch);
     }
 
+    // deletar um lote
     @Override
     public void delete(Integer inventoryId, Integer productId, Integer batchId) {
         Batch batch = findById(inventoryId, productId, batchId);
         repository.delete(batch);
     }
 
-
+    // metodos auxiliares
+    // encontrar produto pelo inventario
     private Product findProductByInventory(Integer inventoryId, Integer productId) {
         Integer userId = verificationService.getUserId();
 
@@ -141,7 +145,7 @@ public class BatchImpl implements BatchService {
         return product;
     }
 
-
+    // checar codigo do lote
     private void checkBatchCode(String code, Integer productId, Integer batchId) {
         List<Batch> batches = repository.findByProductId(productId);
 
@@ -153,5 +157,4 @@ public class BatchImpl implements BatchService {
             throw new DataIntegratyViolationException("Lote com esse código já existe para este produto");
         }
     }
-
 }

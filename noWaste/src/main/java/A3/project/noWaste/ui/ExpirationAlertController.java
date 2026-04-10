@@ -19,6 +19,7 @@ public class ExpirationAlertController {
         this.service = service;
     }
 
+    // listar todos os lotes do usuario que estão para expirar
     @GetMapping("/alerts/expiring")
     public ResponseEntity<List<ExpirationAlertDTO>> findExpiringBatches() {
         return ResponseEntity.ok(service.findExpiringBatches());

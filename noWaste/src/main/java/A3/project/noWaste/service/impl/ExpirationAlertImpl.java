@@ -22,6 +22,8 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
         this.verificationService = verificationService;
     }
 
+    // listar todos os lotes do usuario que estão para expirar em até 7 dias,
+    // Ordenados por data de validade(mais proximo ao mais distante de vencer)
     @Override
     public List<ExpirationAlertDTO> findExpiringBatches() {
         Integer userId = verificationService.getUserId();
@@ -42,6 +44,7 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
                 .collect(Collectors.toList());
     }
 
+    // criar o DTO para retornar ao usuario
     private ExpirationAlertDTO toDTO(Batch batch) {
         ExpirationAlertDTO dto = new ExpirationAlertDTO();
 
