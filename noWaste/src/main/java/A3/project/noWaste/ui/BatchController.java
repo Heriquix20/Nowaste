@@ -5,6 +5,7 @@ import A3.project.noWaste.dto.BatchDTO;
 import A3.project.noWaste.service.BatchService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -43,8 +44,8 @@ public class BatchController {
             @PathVariable Integer productId,
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) LocalDate expirationFrom,
-            @RequestParam(required = false) LocalDate expirationTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationTo,
             @RequestParam(required = false) Integer minQuantity,
             @RequestParam(required = false) Integer maxQuantity,
             @RequestParam(defaultValue = "asc") String sortExpiration) {
