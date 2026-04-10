@@ -31,7 +31,7 @@ public class ProductImpl implements ProductService {
         this.mapper = mapper;
     }
 
-
+    // produto especifio
     @Override
     public Product findById(Integer inventoryId, Integer productId) {
         Inventory inventory = findInventoryByUser(inventoryId);
@@ -39,21 +39,51 @@ public class ProductImpl implements ProductService {
                 .orElseThrow(() -> new ObjectNotFoundException("Produto nao encontrado"));
     }
 
+    // filtros para nome, categoria, marca e peso
     @Override
-    public List<Product> findAllByInventory(Integer inventoryId, String name) {
+    public List<Product> findAllByInventory(
+            Integer inventoryId,
+            String name,
+            String category,
+            String brand,
+            Double minWeight,
+            Double maxWeight) {
         Inventory inventory = findInventoryByUser(inventoryId);
         List<Product> products = repository.findByInventoryId(inventory.getId());
-
         if (name != null && !name.isBlank()) {
             products = products.stream()
                     .filter(product -> product.getName() != null
                             && product.getName().toLowerCase().contains(name.toLowerCase()))
                     .toList();
         }
+        if (category != null && !category.isBlank()) {
+            products = products.stream()
+                    .filter(product -> product.getCategory() != null
+                            && product.getCategory().toLowerCase().contains(category.toLowerCase()))
+                    .toList();
+        }
+        if (brand != null && !brand.isBlank()) {
+            products = products.stream()
+                    .filter(product -> product.getBrand() != null
+                            && product.getBrand().toLowerCase().contains(brand.toLowerCase()))
+                    .toList();
+        }
+        if (minWeight != null) {
+            products = products.stream()
+                    .filter(product -> product.getWeight() != null
+                            && product.getWeight() >= minWeight)
+                    .toList();
+        }
+        if (maxWeight != null) {
+            products = products.stream()
+                    .filter(product -> product.getWeight() != null
+                            && product.getWeight() <= maxWeight)
+                    .toList();
+        }
         return products;
     }
 
-
+    // criar produto
     @Override
     public Product create(Integer inventoryId, ProductDTO obj) {
         Inventory inventory = findInventoryByUser(inventoryId);
@@ -67,6 +97,7 @@ public class ProductImpl implements ProductService {
         return repository.save(product);
     }
 
+    // atualizar produto
     @Override
     public Product update(Integer inventoryId, Integer productId, ProductDTO obj) {
         Product product = findById(inventoryId, productId);
@@ -81,6 +112,7 @@ public class ProductImpl implements ProductService {
         return repository.save(product);
     }
 
+    // deletar produto
     @Override
     public void delete(Integer inventoryId, Integer productId) {
         Product product = findById(inventoryId, productId);
@@ -88,8 +120,7 @@ public class ProductImpl implements ProductService {
     }
 
 
-
-
+    // metodos de verificacao
     private Inventory findInventoryByUser(Integer inventoryId) {
         Integer userId = verificationService.getUserId();
 
