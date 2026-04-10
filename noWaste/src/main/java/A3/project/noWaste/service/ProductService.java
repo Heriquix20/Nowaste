@@ -15,7 +15,8 @@ public interface ProductService {
             String category,
             String brand,
             Double minWeight,
-            Double maxWeight
+            Double maxWeight,
+            String sortWeight
     );
 
     Product create(Integer inventoryId, ProductDTO obj);
