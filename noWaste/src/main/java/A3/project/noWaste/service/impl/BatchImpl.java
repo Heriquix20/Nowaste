@@ -12,6 +12,7 @@ import A3.project.noWaste.service.VerificationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -38,10 +39,47 @@ public class BatchImpl implements BatchService {
     }
 
     @Override
-    public List<Batch> findAllByProduct(Integer inventoryId, Integer productId) {
-        Product product = findProductByInventory(inventoryId, productId);
+    public List<Batch> findAllByProduct(Integer inventoryId, Integer productId, String code,
+                                        String status, LocalDate expirationFrom,
+                                        LocalDate expirationTo, String sortExpiration) {
 
-        return repository.findByProductId(product.getId());
+        Product product = findProductByInventory(inventoryId, productId);
+        List<Batch> batches = repository.findByProductId(product.getId());
+
+        if (code != null && !code.isBlank()) {
+            batches = batches.stream()
+                    .filter(batch -> batch.getCode() != null
+                            && batch.getCode().toLowerCase().contains(code.toLowerCase()))
+                    .toList();
+        }
+        if (status != null && !status.isBlank()) {
+            batches = batches.stream()
+                    .filter(batch -> batch.getStatus() != null
+                            && batch.getStatus().equalsIgnoreCase(status))
+                    .toList();
+        }
+        if (expirationFrom != null) {
+            batches = batches.stream()
+                    .filter(batch -> batch.getExpirationDate() != null
+                            && !batch.getExpirationDate().isBefore(expirationFrom))
+                    .toList();
+        }
+        if (expirationTo != null) {
+            batches = batches.stream()
+                    .filter(batch -> batch.getExpirationDate() != null
+                            && !batch.getExpirationDate().isAfter(expirationTo))
+                    .toList();
+        }
+        if ("desc".equalsIgnoreCase(sortExpiration)) {
+            batches = batches.stream()
+                    .sorted((b1, b2) -> b2.getExpirationDate().compareTo(b1.getExpirationDate()))
+                    .toList();
+        } else {
+            batches = batches.stream()
+                    .sorted((b1, b2) -> b1.getExpirationDate().compareTo(b2.getExpirationDate()))
+                    .toList();
+        }
+        return batches;
     }
 
     @Override
