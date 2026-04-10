@@ -36,7 +36,7 @@ public class BatchController {
     }
 
 
-    // listar lote e filtrar por codigo, status, data de validade e ordenação por data de validade
+    // listar lote e filtrar por codigo, status, data de validade, quantidade e ordenação por data de validade
     @GetMapping("/inventories/{inventoryId}/products/{productId}/batches")
     public ResponseEntity<List<BatchDTO>> findAllByProduct(
             @PathVariable Integer inventoryId,
@@ -45,16 +45,13 @@ public class BatchController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) LocalDate expirationFrom,
             @RequestParam(required = false) LocalDate expirationTo,
+            @RequestParam(required = false) Integer minQuantity,
+            @RequestParam(required = false) Integer maxQuantity,
             @RequestParam(defaultValue = "asc") String sortExpiration) {
 
-        List<Batch> list = service.findAllByProduct(
-                inventoryId,
-                productId,
-                code,
-                status,
-                expirationFrom,
-                expirationTo,
-                sortExpiration);
+        List<Batch> list = service.findAllByProduct(inventoryId, productId, code, status,
+                expirationFrom, expirationTo, minQuantity, maxQuantity, sortExpiration);
+
         List<BatchDTO> listDTO = list.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
