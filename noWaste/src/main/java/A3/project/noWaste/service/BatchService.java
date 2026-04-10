@@ -18,6 +18,8 @@ public interface BatchService {
             String status,
             LocalDate expirationFrom,
             LocalDate expirationTo,
+            Integer minQuantity,
+            Integer maxQuantity,
             String sortExpiration
     );
 
