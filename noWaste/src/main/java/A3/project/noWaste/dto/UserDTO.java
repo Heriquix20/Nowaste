@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter @Getter
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
@@ -16,7 +17,7 @@ public class UserDTO {
     private Integer id;
 
     @NotBlank(message = "O username é obrigatório")
-    private String Username;
+    private String name;
 
     @NotBlank(message = "O email é obrigatório")
     @Email(message = "Email digitado inválido")
