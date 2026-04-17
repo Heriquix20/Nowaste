@@ -40,7 +40,7 @@ public class ProductImpl implements ProductService {
                 .orElseThrow(() -> new ObjectNotFoundException("Produto nao encontrado"));
     }
 
-    // listar produtos e filtrar por nome, categoria, marca, peso e ordenação por peso
+    // listar produtos e filtrar por nome, categoria, marca, peso e ordenacao por peso
     @Override
     public List<Product> findAllByInventory(Integer inventoryId, String name, String category,
                                             String brand, Double minWeight,
@@ -67,45 +67,50 @@ public class ProductImpl implements ProductService {
                             && product.getBrand().toLowerCase().contains(brand.toLowerCase()))
                     .toList();
         }
+        if (minWeight != null && maxWeight != null && minWeight > maxWeight) {
+            throw new DataIntegratyViolationException("O peso mínimo nao pode ser maior que o peso máximo");
+        }
         if (minWeight != null) {
             products = products.stream()
-                    .filter(product -> product.getWeight() != null
-                            && product.getWeight() >= minWeight)
+                    .filter(product -> product.getWeightInGrams() != null
+                            && product.getWeightInGrams() >= minWeight)
                     .toList();
         }
         if (maxWeight != null) {
             products = products.stream()
-                    .filter(product -> product.getWeight() != null
-                            && product.getWeight() <= maxWeight)
+                    .filter(product -> product.getWeightInGrams() != null
+                            && product.getWeightInGrams() <= maxWeight)
                     .toList();
         }
         if ("desc".equalsIgnoreCase(sortWeight)) {
             products = products.stream()
-                    .sorted((p1, p2) -> p2.getWeight().compareTo(p1.getWeight()))
+                    .sorted((p1, p2) -> p2.getWeightInGrams().compareTo(p1.getWeightInGrams()))
                     .toList();
         } else if ("asc".equalsIgnoreCase(sortWeight)) {
             products = products.stream()
-                    .sorted((p1, p2) -> p1.getWeight().compareTo(p2.getWeight()))
+                    .sorted((p1, p2) -> p1.getWeightInGrams().compareTo(p2.getWeightInGrams()))
                     .toList();
         }
         return products;
     }
 
-    // criar produto
     @Override
     public Product create(Integer inventoryId, ProductDTO obj) {
         Inventory inventory = findInventoryByUser(inventoryId);
 
         checkProductName(obj.getName(), inventory.getId(), null);
 
-        Product product = mapper.map(obj, Product.class);
+        Product product = new Product();
         product.setId(null);
+        product.setName(obj.getName());
+        product.setCategory(obj.getCategory());
+        product.setBrand(obj.getBrand());
+        product.setWeightInGrams(convertToGrams(obj.getWeight(), obj.getWeightUnit()));
         product.setInventory(inventory);
 
         return repository.save(product);
     }
 
-    // atualizar produto
     @Override
     public Product update(Integer inventoryId, Integer productId, ProductDTO obj) {
         Product product = findById(inventoryId, productId);
@@ -113,9 +118,11 @@ public class ProductImpl implements ProductService {
         checkProductName(obj.getName(), inventoryId, product.getId());
 
         product.setName(obj.getName());
-        product.setWeight(obj.getWeight());
         product.setCategory(obj.getCategory());
         product.setBrand(obj.getBrand());
+        product.setWeightInGrams(convertToGrams(obj.getWeight(), obj.getWeightUnit()));
+
+        int a = 20;
 
         return repository.save(product);
     }
@@ -148,5 +155,12 @@ public class ProductImpl implements ProductService {
         if (exists) {
             throw new DataIntegratyViolationException("Produto com esse nome ja existe no inventario");
         }
+    }
+
+    private Double convertToGrams(Double weight, String unit) {
+        if ("kg".equalsIgnoreCase(unit)) {
+            return weight * 1000;
+        }
+        return weight;
     }
 }
