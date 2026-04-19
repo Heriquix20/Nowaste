@@ -62,12 +62,17 @@ public class Batch {
         if (expirationDate == null) {
             return "UNKNOWN";
         }
-        java.time.LocalDate today = java.time.LocalDate.now();
-        if (expirationDate.isBefore(today)) {
+        LocalDate today = LocalDate.now();
+        long days = java.time.temporal.ChronoUnit.DAYS.between(today, expirationDate);
+
+        if (days < 0) {
             return "EXPIRED";
         }
-        if (!expirationDate.isAfter(today.plusDays(7))) {
+        if (days <= 7) {
             return "WARNING";
+        }
+        if (days <= 30) {
+            return "MONTH_WARNING";
         }
         return "OK";
     }
