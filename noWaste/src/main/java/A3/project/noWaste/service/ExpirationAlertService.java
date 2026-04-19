@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface ExpirationAlertService {
 
-    List<ExpirationAlertDTO> findExpiringBatches();
+    List<ExpirationAlertDTO> findBatchesExpiringThisMonth();
+    List<ExpirationAlertDTO> findExpiredBatches();
 }
+
