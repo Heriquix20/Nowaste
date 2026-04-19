@@ -122,8 +122,6 @@ public class ProductImpl implements ProductService {
         product.setBrand(obj.getBrand());
         product.setWeightInGrams(convertToGrams(obj.getWeight(), obj.getWeightUnit()));
 
-        int a = 20;
-
         return repository.save(product);
     }
 
