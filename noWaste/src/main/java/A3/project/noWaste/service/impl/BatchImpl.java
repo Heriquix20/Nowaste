@@ -101,10 +101,11 @@ public class BatchImpl implements BatchService {
     public Batch create(Integer inventoryId, Integer productId, BatchDTO obj) {
         Product product = findProductByInventory(inventoryId, productId);
 
-        checkBatchCode(obj.getCode(), product.getId(), null);
-
-        Batch batch = mapper.map(obj, Batch.class);
+        Batch batch = new Batch();
         batch.setId(null);
+        batch.setCode(generateBatchCode(product));
+        batch.setQuantity(obj.getQuantity());
+        batch.setExpirationDate(obj.getExpirationDate());
         batch.setProduct(product);
 
         return repository.save(batch);
@@ -115,9 +116,6 @@ public class BatchImpl implements BatchService {
     public Batch update(Integer inventoryId, Integer productId, Integer batchId, BatchDTO obj) {
         Batch batch = findById(inventoryId, productId, batchId);
 
-        checkBatchCode(obj.getCode(), productId, batch.getId());
-
-        batch.setCode(obj.getCode());
         batch.setQuantity(obj.getQuantity());
         batch.setExpirationDate(obj.getExpirationDate());
 
@@ -145,16 +143,43 @@ public class BatchImpl implements BatchService {
         return product;
     }
 
-    // checar codigo do lote
-    private void checkBatchCode(String code, Integer productId, Integer batchId) {
-        List<Batch> batches = repository.findByProductId(productId);
+    // metodos auxiliares
+    // gerar codigo de lote
+    private String generateBatchCode(Product product) {
+        List<Batch> batches = repository.findByProductId(product.getId());
 
-        boolean exists = batches.stream()
-                .anyMatch(batch -> batch.getCode().equalsIgnoreCase(code)
-                        && (batchId == null || !batch.getId().equals(batchId)));
+        int nextSequence = batches.stream()
+                .map(Batch::getCode)
+                .map(this::extractSequenceNumber)
+                .max(Integer::compareTo)
+                .orElse(0) + 1;
 
-        if (exists) {
-            throw new DataIntegratyViolationException("Lote com esse código já existe para este produto");
+        String normalizedProductName = normalizeProductName(product.getName());
+
+        return "LT-" + normalizedProductName + "-" + String.format("%03d", nextSequence);
+    }
+
+    // tratar o nome do produto para virar codigo
+    private String normalizeProductName(String productName) {
+        return productName == null
+                ? "PRODUTO"
+                : productName.trim()
+                  .toUpperCase()
+                  .replaceAll("[^A-Z0-9]+", "_")
+                  .replaceAll("^_+|_+$", "");
+    }
+
+    // extrair o ultimo numero da sequencia de codigos
+    private Integer extractSequenceNumber(String code) {
+        if (code == null || code.isBlank()) {
+            return 0;
+        }
+        String[] parts = code.split("-");
+        String lastPart = parts[parts.length - 1];
+        try {
+            return Integer.parseInt(lastPart);
+        } catch (NumberFormatException ex) {
+            return 0;
         }
     }
 }
