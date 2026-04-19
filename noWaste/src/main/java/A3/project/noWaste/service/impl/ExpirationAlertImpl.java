@@ -7,6 +7,7 @@ import A3.project.noWaste.service.ExpirationAlertService;
 import A3.project.noWaste.service.VerificationService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,29 +23,49 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
         this.verificationService = verificationService;
     }
 
-    // listar todos os lotes do usuario que estão para expirar em até 7 dias,
-    // Ordenados por data de validade(mais proximo ao mais distante de vencer)
+    // lotes do usuario que vencem no mes atual
     @Override
-    public List<ExpirationAlertDTO> findExpiringBatches() {
+    public List<ExpirationAlertDTO> findBatchesExpiringThisMonth() {
         Integer userId = verificationService.getUserId();
+        LocalDate today = LocalDate.now();
+        int currentMonth = today.getMonthValue();
+        int currentYear = today.getYear();
 
         return batchRepository.findAll().stream()
-                .filter(batch -> batch.getProduct() != null)
-                .filter(batch -> batch.getProduct().getInventory() != null)
-                .filter(batch -> batch.getProduct().getInventory().getUser() != null)
-                .filter(batch -> batch.getProduct().getInventory().getUser().getId().equals(userId))
-                .filter(batch -> {
-                    Long days = batch.getDaysToExpire();
-                    return days != null && days <= 7;
-                })
-                .sorted(Comparator
-                        .comparing(Batch::getDaysToExpire)
-                        .thenComparing(Batch::getExpirationDate))
+                .filter(batch -> belongsToUser(batch, userId))
+                .filter(batch -> batch.getExpirationDate() != null)
+                .filter(batch -> batch.getExpirationDate().getMonthValue() == currentMonth
+                        && batch.getExpirationDate().getYear() == currentYear)
+                .sorted(Comparator.comparing(Batch::getExpirationDate))
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // criar o DTO para retornar ao usuario
+    // lotes do usuario que ja venceram
+    @Override
+    public List<ExpirationAlertDTO> findExpiredBatches() {
+        Integer userId = verificationService.getUserId();
+
+        return batchRepository.findAll().stream()
+                .filter(batch -> belongsToUser(batch, userId))
+                .filter(batch -> {
+                    Long days = batch.getDaysToExpire();
+                    return days != null && days < 0;
+                })
+                .sorted(Comparator.comparing(Batch::getExpirationDate))
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // metodo auxiliar
+    private boolean belongsToUser(Batch batch, Integer userId) {
+        return batch.getProduct() != null
+                && batch.getProduct().getInventory() != null
+                && batch.getProduct().getInventory().getUser() != null
+                && batch.getProduct().getInventory().getUser().getId().equals(userId);
+    }
+
+    // metodo para gerar o DTO de alerta
     private ExpirationAlertDTO toDTO(Batch batch) {
         ExpirationAlertDTO dto = new ExpirationAlertDTO();
 
