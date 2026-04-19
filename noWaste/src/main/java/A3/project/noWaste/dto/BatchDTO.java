@@ -2,7 +2,6 @@ package A3.project.noWaste.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +18,6 @@ public class BatchDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O código do lote é obrigatório")
     private String code;
 
     @NotNull(message = "A quantidade não pode ser nula")
