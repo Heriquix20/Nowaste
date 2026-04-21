@@ -9,7 +9,7 @@ public interface InventoryService {
 
     Inventory findById(Integer id);
 
-    List<Inventory> findAll();
+    List<Inventory> findAll(String name, String sort);
 
     Inventory create(InventoryDTO obj);
 

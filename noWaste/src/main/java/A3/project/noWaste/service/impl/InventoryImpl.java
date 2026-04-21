@@ -28,6 +28,7 @@ public class InventoryImpl implements InventoryService {
     }
 
 
+    // inventario especifico
     @Override
     public Inventory findById(Integer id) {
         Integer userId = verificationService.getUserId();
@@ -35,12 +36,27 @@ public class InventoryImpl implements InventoryService {
                 .orElseThrow(() -> new ObjectNotFoundException("Inventário não encontrado"));
     }
 
+    // listar inventarios e filtrar por nome e ordenar por data de criacao
     @Override
-    public List<Inventory> findAll() {
+    public List<Inventory> findAll(String name, String sort) {
         Integer userId = verificationService.getUserId();
-        return repository.findByUserId(userId);
+        List<Inventory> inventories;
+
+        if (name != null && !name.isBlank()) {
+            inventories = repository.findByUserIdAndNameContainingIgnoreCase(userId, name);
+        } else {
+            inventories = repository.findByUserId(userId);
+        }
+
+        if ("asc".equalsIgnoreCase(sort)) {
+            inventories.sort((i1, i2) -> i1.getCreatedAt().compareTo(i2.getCreatedAt()));
+        } else {
+            inventories.sort((i1, i2) -> i2.getCreatedAt().compareTo(i1.getCreatedAt()));
+        }
+        return inventories;
     }
 
+    // criar inventario
     @Override
     public Inventory create(InventoryDTO obj) {
         User user = verificationService.verifyUser();
@@ -53,11 +69,13 @@ public class InventoryImpl implements InventoryService {
         return repository.save(inventory);
     }
 
+    // atualizar inventario
     @Override
     public Inventory update(Integer id, InventoryDTO obj) {
         Integer userId = verificationService.getUserId();
+        obj.setId(id);
 
-        Inventory upInventory = repository.findByIdAndUserId(obj.getId(), userId)
+        Inventory upInventory = repository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Inventario nao encontrado"));
 
         checkInventoryName(obj);
@@ -68,6 +86,7 @@ public class InventoryImpl implements InventoryService {
         return repository.save(upInventory);
     }
 
+    // deletar inventario
     @Override
     public void delete(Integer id) {
         Integer userId = verificationService.getUserId();
@@ -78,9 +97,8 @@ public class InventoryImpl implements InventoryService {
         repository.delete(inventory);
     }
 
-
-
-
+    // metodo auxiliar
+    // checar nome de inventario
     private void checkInventoryName(InventoryDTO obj) {
         Integer userId = verificationService.getUserId();
         Optional<Inventory> inv = repository.findByUserId(userId).stream()

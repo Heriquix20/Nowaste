@@ -25,7 +25,6 @@ public class UserController {
     @Autowired
     private ModelMapper mapper;
 
-
     // get users
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
@@ -46,16 +45,17 @@ public class UserController {
 
     // update user
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Integer Id, @RequestBody UserDTO obj) {
-        obj.setId(Id);
+    public ResponseEntity<UserDTO> update(@PathVariable Integer id, @RequestBody @Valid UserDTO obj) {
+        obj.setId(id);
         User newObj = service.update(obj);
         return ResponseEntity.ok().body(mapper.map(newObj, UserDTO.class));
     }
 
     // delete user
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity delete(@PathVariable Integer Id) {
-        service.delete(Id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }
