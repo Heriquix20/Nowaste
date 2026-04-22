@@ -2,10 +2,11 @@
 
 ## 🧾 Sobre o projeto
 
-O Nowaste é um sistema em Java focado no controle de validade de produtos em estoque, utilizando gerenciamento por lotes.
+O **Nowaste** é um sistema em Java focado no controle de validade de produtos em estoque, utilizando gerenciamento por lotes.
 A proposta é permitir que empresas acompanhem com mais precisão as datas de validade dos produtos, reduzindo desperdícios e prejuízos.
 
-O sistema está sendo desenvolvido de forma incremental utilizando Scrum, evoluindo a cada sprint com novas funcionalidades e melhorias.
+O sistema está sendo desenvolvido de forma incremental utilizando **Scrum**.
+Atualmente, o projeto já contempla as entregas da **Sprint 0 e Sprint 1 (MVP)**.
 
 ---
 
@@ -13,62 +14,67 @@ O sistema está sendo desenvolvido de forma incremental utilizando Scrum, evolui
 
 Empresas que trabalham com estoque enfrentam dificuldades como:
 
-* controle de validade por lote
-* identificação de produtos próximos do vencimento
-* desperdício de produtos
+* controle de validade por lote  
+* identificação de produtos próximos do vencimento  
+* desperdício de produtos  
 
 ---
 
 ## 👥 Público-alvo
 
-* supermercados
-* mercearias
-* qualquer negócio com controle de estoque por validade
+* supermercados  
+* mercearias  
+* qualquer negócio com controle de estoque por validade  
 
 ---
 
-## ⚙️ Funcionalidades a serem implementadas:
+## ⚙️ Funcionalidades
 
-### ✔️ Sprint 0 (Atual)
+### ✔️ Sprint 0 (Concluída)
 
-* Cadastro de produtos
-* Aba de Login
-* Cadastro de lotes
-* Associação entre produto e lote
-* Estrutura inicial do projeto
-* Organização em camadas (domain, service, repository, ui)
+* Cadastro de produtos  
+* Login de usuário  
+* Cadastro de lotes  
+* Associação entre produto e lote  
+* Estrutura inicial do projeto  
+* Organização em camadas (domain, service, infra, ui)  
+
+---
+
+### ✔️ Sprint 1 (MVP - Concluído/Em aperfeiçoamento)
+
+* Listagem de produtos  
+* Listagem de lotes  
+* Filtros básicos  
+* Status automático de validade  
+* Estrutura inicial de testes com JUnit  
 
 ---
 
 ### 🚧 Próximas sprints
 
-#### Sprint 1 (MVP)
-
-* Listagem de produtos
-* Listagem de lotes
-* Primeiros testes automatizados
-
 #### Sprint 2
 
-* Identificação de produtos próximos do vencimento
-* Produtos que vencem no mês
-* Refinamento das regras de negócio
+* Identificação de produtos próximos do vencimento  
+* Produtos que vencem no mês  
+* Refinamento das regras de negócio  
 
 #### Sprint 3
 
-* Testes completos
-* Melhorias de usabilidade
-* Documentação final
-* Apresentação
+* Testes completos  
+* Melhorias de usabilidade  
+* Documentação final  
+* Apresentação  
 
 ---
 
 ## 🛠️ Tecnologias utilizadas
 
-* Java(JDK 26)
-* Estrutura em camadas (Domain, Service, Repository, UI)
-* Banco de Dados MYSQL
-* JUnit (planejado)
+* Java (JDK 26)  
+* Arquitetura em camadas  
+* MySQL  
+* JUnit  
+* Maven  
 
 ---
 
@@ -99,30 +105,65 @@ src/
 
 ---
 
-## 🧪 Como rodar os testes
+## 🧪 Testes
 
 ```bash
-# ainda em desenvolvimento
+# em desenvolvimento
 ```
-
-Testes serão implementados a partir da Sprint 1 utilizando JUnit.
 
 ---
 
-## 👨‍💻 Integrantes e papéis (Sprint 0-1(sprint 1 em desenvolvimento))
+## 💡 Exemplo de código do projeto
 
-* Gabriel Felipe — Product Owner/front
-* Isadora Rodrigues — frontend
-* Wesley Carvalho — Scrum Master
-* Henrique Cezar — backend
-* Gabrielly dos Santos - frontend
+```java
+public class Product {
 
+    private String name;
+    private double weight;
+
+    public Product(String name, double weight) {
+        this.name = name;
+        this.weight = weight;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+}
+```
+
+```java
+public String getStatus(LocalDate expirationDate) {
+    long days = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate);
+
+    if (days < 0) return "EXPIRED";
+    if (days <= 7) return "WARNING";
+    if (days <= 30) return "MONTH_WARNING";
+    return "OK";
+}
+```
+
+---
+
+## 👨‍💻 Integrantes e papéis (Sprint 0-1)
+
+* Gabriel Felipe — Product Owner / Frontend  
+* Isadora Rodrigues — Frontend  
+* Wesley Carvalho — Scrum Master  
+* Henrique Cezar — Backend  
+* Gabrielly dos Santos — Frontend  
 
 ---
 
 ## 📌 Status do projeto
 
-🚧 Em desenvolvimento (Sprint 0 concluída)
+🚧 Em desenvolvimento  
+✔️ Sprint 0 concluída  
+🚧 Sprint 1 em andamento (MVP)
 
 ---
 
