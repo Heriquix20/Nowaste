@@ -6,6 +6,7 @@ import A3.project.noWaste.exceptions.ObjectNotFoundException;
 import A3.project.noWaste.infra.UserRepository;
 import A3.project.noWaste.service.UserService;
 import A3.project.noWaste.exceptions.DataIntegratyViolationException;
+import A3.project.noWaste.service.VerificationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,9 @@ public class UserImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private VerificationService verificationService;
+
 
     // find all Users
     @Override
@@ -41,7 +45,7 @@ public class UserImpl implements UserService {
 
         User newUser = new User();
         newUser.setPassword(passwordEncoder.encode(obj.getPassword()));
-        newUser.setUsername(obj.getUsername());
+        newUser.setName(obj.getName());
         newUser.setEmail(obj.getEmail());
         newUser.setId(obj.getId());
 
@@ -51,24 +55,34 @@ public class UserImpl implements UserService {
     // update user
     @Override
     public User update(UserDTO obj) {
+        Integer loggedUserId = verificationService.getUserId();
+
+        if (!loggedUserId.equals(obj.getId())) {
+            throw new DataIntegratyViolationException("Acesso negado");
+        }
+
         findByEmail(obj);
 
-        User newUser = new User();
-        newUser.setPassword(passwordEncoder.encode(obj.getPassword()));
-        newUser.setUsername(obj.getUsername());
-        newUser.setEmail(obj.getEmail());
-        newUser.setId(obj.getId());
+        User existingUser = repository.findById(obj.getId())
+                .orElseThrow(() -> new ObjectNotFoundException("Usuario nao existe"));
 
-        return repository.save(mapper.map(obj, User.class));
+        existingUser.setName(obj.getName());
+        existingUser.setEmail(obj.getEmail());
+        existingUser.setPassword(passwordEncoder.encode(obj.getPassword()));
+
+        return repository.save(existingUser);
     }
 
     // delete User
     @Override
     public void delete(Integer id) {
-        if (!repository.findById(id).isPresent()) {
-            throw new ObjectNotFoundException("Usuário não existe");
+        Integer loggedUserId = verificationService.getUserId();
+        if (!loggedUserId.equals(id)) {
+            throw new DataIntegratyViolationException("Acesso negado");
         }
-        repository.deleteById(id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Usuario nao existe"));
+        repository.delete(user);
     }
 
     // email verification

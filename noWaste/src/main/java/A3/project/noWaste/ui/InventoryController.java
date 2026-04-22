@@ -26,23 +26,26 @@ public class InventoryController {
         this.mapper = mapper;
     }
 
-
+    // inventario especifico
     @GetMapping("/{id}")
     public ResponseEntity<InventoryDTO> findById(@PathVariable Integer id) {
         Inventory inventory = service.findById(id);
         return ResponseEntity.ok(mapper.map(inventory, InventoryDTO.class));
     }
 
+    // listar inventarios e filtrar por nome e ordenar por data de criacao
     @GetMapping
-    public ResponseEntity<List<InventoryDTO>> findAll() {
-        List<Inventory> list = service.findAll();
+    public ResponseEntity<List<InventoryDTO>> findAll(@RequestParam(required = false) String name,
+                                                      @RequestParam(defaultValue = "desc") String sort) {
+        List<Inventory> list = service.findAll(name, sort);
         List<InventoryDTO> listDTO = list.stream()
                 .map(inv -> mapper.map(inv, InventoryDTO.class))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(listDTO);
+        return ResponseEntity.ok().body(listDTO);
     }
 
+    // criar inventario
     @PostMapping
     public ResponseEntity<InventoryDTO> create(@Valid @RequestBody InventoryDTO obj) {
         Inventory newInv = service.create(obj);
@@ -53,12 +56,14 @@ public class InventoryController {
         return ResponseEntity.created(uri).body(mapper.map(newInv, InventoryDTO.class));
     }
 
+    // atualizar inventario
     @PutMapping("/{id}")
     public ResponseEntity<InventoryDTO> update(@PathVariable Integer id, @Valid @RequestBody InventoryDTO obj) {
         Inventory updated = service.update(id, obj);
         return ResponseEntity.ok(mapper.map(updated, InventoryDTO.class));
     }
 
+    // deletar inventario
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.delete(id);

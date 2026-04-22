@@ -14,4 +14,5 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
     Optional<Inventory> findByIdAndUserId(Integer inventoryId, Integer userId);
 
+    List<Inventory> findByUserIdAndNameContainingIgnoreCase(Integer userId, String name);
 }

@@ -9,7 +9,15 @@ public interface ProductService {
 
     Product findById(Integer inventoryId, Integer productId);
 
-    List<Product> findAllByInventory(Integer inventoryId);
+    List<Product> findAllByInventory(
+            Integer inventoryId,
+            String name,
+            String category,
+            String brand,
+            Double minWeight,
+            Double maxWeight,
+            String sortWeight
+    );
 
     Product create(Integer inventoryId, ProductDTO obj);
 

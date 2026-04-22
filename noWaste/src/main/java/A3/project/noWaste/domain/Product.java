@@ -23,15 +23,15 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "O nome do produto e obrigatorio")
+    @NotBlank(message = "O nome do produto e obrigatório")
     @Column(nullable = false)
     private String name;
 
-    @NotNull(message = "O peso do produto e obrigatorio")
+    @NotNull(message = "O peso do produto e obrigatório")
     @Column(nullable = false)
-    private Double weight;
+    private Double weightInGrams;
 
-    @NotBlank(message = "A categoria do produto e obrigatoria")
+    @NotBlank(message = "A categoria do produto e obrigatória")
     @Column(nullable = false)
     private String category;
 
