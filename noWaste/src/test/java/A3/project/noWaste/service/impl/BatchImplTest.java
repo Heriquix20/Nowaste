@@ -5,6 +5,7 @@ import A3.project.noWaste.domain.Inventory;
 import A3.project.noWaste.domain.Product;
 import A3.project.noWaste.domain.User;
 import A3.project.noWaste.dto.BatchDTO;
+import A3.project.noWaste.exceptions.DataIntegratyViolationException;
 import A3.project.noWaste.infra.BatchRepository;
 import A3.project.noWaste.infra.ProductRepository;
 import A3.project.noWaste.service.VerificationService;
@@ -20,7 +21,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,6 +105,147 @@ class BatchImplTest {
         assertEquals("LT-FEIJAO_PRETO-001", savedBatch.getCode());
     }
 
+    @Test
+    void shouldReturnBatchByIdWhenProductBelongsToAuthenticatedUser() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+        Product product = createProduct(productId, "Arroz", userId);
+        Batch batch = new Batch();
+        batch.setId(50);
+        batch.setProduct(product);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+        when(repository.findByIdAndProductId(50, productId)).thenReturn(Optional.of(batch));
+
+        Batch result = service.findById(inventoryId, productId, 50);
+
+        assertSame(batch, result);
+    }
+
+    @Test
+    void shouldFilterBatchesByMultipleCriteria() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+        Product product = createProduct(productId, "Arroz", userId);
+        LocalDate today = LocalDate.now();
+
+        Batch matching = createBatch(1, "LT-ARROZ-001", 10, today.plusDays(5), product);
+        Batch wrongStatus = createBatch(2, "LT-ARROZ-002", 10, today.plusDays(40), product);
+        Batch wrongQuantity = createBatch(3, "LT-ARROZ-003", 2, today.plusDays(5), product);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+        when(repository.findByProductId(productId)).thenReturn(List.of(matching, wrongStatus, wrongQuantity));
+
+        List<Batch> result = service.findAllByProduct(
+                inventoryId, productId, "001", "WARNING",
+                today.plusDays(1), today.plusDays(10), 5, 20, "asc"
+        );
+
+        assertEquals(1, result.size());
+        assertSame(matching, result.get(0));
+    }
+
+    @Test
+    void shouldSortBatchesByExpirationDateDescendingWhenRequested() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+        Product product = createProduct(productId, "Arroz", userId);
+        LocalDate today = LocalDate.now();
+
+        Batch first = createBatch(1, "LT-ARROZ-001", 10, today.plusDays(3), product);
+        Batch second = createBatch(2, "LT-ARROZ-002", 10, today.plusDays(10), product);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+        when(repository.findByProductId(productId)).thenReturn(List.of(first, second));
+
+        List<Batch> result = service.findAllByProduct(
+                inventoryId, productId, null, null, null, null, null, null, "desc"
+        );
+
+        assertEquals(List.of(second, first), result);
+    }
+
+    @Test
+    void shouldUpdateBatchFields() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+        Product product = createProduct(productId, "Arroz", userId);
+        Batch existing = createBatch(50, "LT-ARROZ-001", 10, LocalDate.now().plusDays(5), product);
+
+        BatchDTO dto = new BatchDTO();
+        dto.setQuantity(20);
+        dto.setExpirationDate(LocalDate.now().plusDays(15));
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+        when(repository.findByIdAndProductId(50, productId)).thenReturn(Optional.of(existing));
+        when(repository.save(existing)).thenReturn(existing);
+
+        Batch updated = service.update(inventoryId, productId, 50, dto);
+
+        assertEquals(20, updated.getQuantity());
+        assertEquals(dto.getExpirationDate(), updated.getExpirationDate());
+    }
+
+    @Test
+    void shouldDeleteBatchFromProduct() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+        Product product = createProduct(productId, "Arroz", userId);
+        Batch existing = createBatch(50, "LT-ARROZ-001", 10, LocalDate.now().plusDays(5), product);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+        when(repository.findByIdAndProductId(50, productId)).thenReturn(Optional.of(existing));
+
+        service.delete(inventoryId, productId, 50);
+
+        verify(repository).delete(existing);
+    }
+
+    @Test
+    void shouldThrowAccessDeniedWhenProductBelongsToAnotherUser() {
+        Integer inventoryId = 10;
+        Integer productId = 100;
+        Product product = createProduct(productId, "Arroz", 99);
+
+        when(verificationService.getUserId()).thenReturn(1);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+
+        assertThrows(DataIntegratyViolationException.class,
+                () -> service.create(inventoryId, productId, createBatchDTO()));
+    }
+
+    @Test
+    void shouldIgnoreInvalidExistingCodeAndStartFromOne() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+
+        Product product = createProduct(productId, "Arroz", userId);
+        BatchDTO dto = createBatchDTO();
+
+        Batch existingBatch = new Batch();
+        existingBatch.setCode("LT-ARROZ-ABC");
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId)).thenReturn(Optional.of(product));
+        when(repository.findByProductId(productId)).thenReturn(List.of(existingBatch));
+        when(repository.save(any(Batch.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Batch savedBatch = service.create(inventoryId, productId, dto);
+
+        assertEquals("LT-ARROZ-001", savedBatch.getCode());
+    }
+
     private Product createProduct(Integer productId, String productName, Integer userId) {
         User user = new User();
         user.setId(userId);
@@ -122,5 +267,15 @@ class BatchImplTest {
         dto.setQuantity(10);
         dto.setExpirationDate(LocalDate.now().plusDays(15));
         return dto;
+    }
+
+    private Batch createBatch(Integer id, String code, Integer quantity, LocalDate expirationDate, Product product) {
+        Batch batch = new Batch();
+        batch.setId(id);
+        batch.setCode(code);
+        batch.setQuantity(quantity);
+        batch.setExpirationDate(expirationDate);
+        batch.setProduct(product);
+        return batch;
     }
 }
