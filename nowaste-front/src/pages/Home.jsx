@@ -344,7 +344,7 @@ export default function Home() {
                         <li><a href="#faq">FAQ</a></li>
                     </ul>
                     <div className="nav-cta">
-                        <a href="/login" className="btn-ghost">Sign in</a>
+                        <a href="/login" className="btn-ghost">Entrar</a>
                         <a href="/register" className="btn-primary">Cadastre-se agora</a>
                     </div>
                     <button className="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
