@@ -61,7 +61,7 @@ O sistema busca apoiar negócios que precisam de um controle mais eficiente sobr
 ## 🧰 Stack utilizada
 
 ### Desenvolvimento backend
-- Java 26
+- Java 21
 - Spring Boot 4.0.4
 - Spring Web
 - Spring Data JPA
