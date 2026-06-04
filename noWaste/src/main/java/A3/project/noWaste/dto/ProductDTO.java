@@ -1,5 +1,6 @@
 package A3.project.noWaste.dto;
 
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class ProductDTO {
     private String name;
 
     @NotNull(message = "O peso do produto é obrigatório")
+    @Positive(message = "O peso do produto deve ser maior que zero")
     private Double weight;
 
     @NotBlank(message = "A categoria do produto é obrigatória")

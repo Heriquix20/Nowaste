@@ -9,7 +9,6 @@ import A3.project.noWaste.infra.InventoryRepository;
 import A3.project.noWaste.infra.ProductRepository;
 import A3.project.noWaste.service.ProductService;
 import A3.project.noWaste.service.VerificationService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,15 +19,14 @@ public class ProductImpl implements ProductService {
     private final ProductRepository repository;
     private final InventoryRepository inventoryRepository;
     private final VerificationService verificationService;
-    private final ModelMapper mapper;
+
 
     public ProductImpl(
             ProductRepository repository, InventoryRepository
-                    inventoryRepository, VerificationService verificationService, ModelMapper mapper) {
+                    inventoryRepository, VerificationService verificationService) {
         this.repository = repository;
         this.inventoryRepository = inventoryRepository;
         this.verificationService = verificationService;
-        this.mapper = mapper;
     }
 
 
@@ -38,6 +36,13 @@ public class ProductImpl implements ProductService {
         Inventory inventory = findInventoryByUser(inventoryId);
         return repository.findByIdAndInventoryId(productId, inventory.getId())
                 .orElseThrow(() -> new ObjectNotFoundException("Produto nao encontrado"));
+    }
+
+    // produtos de um usuário
+    @Override
+    public List<Product> findAllByUser() {
+        Integer userId = verificationService.getUserId();
+        return repository.findByInventoryUserId(userId);
     }
 
     // listar produtos e filtrar por nome, categoria, marca, peso e ordenacao por peso
@@ -156,9 +161,18 @@ public class ProductImpl implements ProductService {
     }
 
     private Double convertToGrams(Double weight, String unit) {
+        if (unit == null || unit.isBlank()) {
+            throw new DataIntegratyViolationException("A unidade de peso é obrigatória");
+        }
+
         if ("kg".equalsIgnoreCase(unit)) {
             return weight * 1000;
         }
-        return weight;
+
+        if ("g".equalsIgnoreCase(unit)) {
+            return weight;
+        }
+
+        throw new DataIntegratyViolationException("Unidade de peso inválida. Use kg ou g");
     }
 }
