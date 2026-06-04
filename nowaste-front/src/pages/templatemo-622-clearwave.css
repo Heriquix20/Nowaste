@@ -1073,3 +1073,60 @@ Free for personal and commercial use
       .hero-trust { gap: 12px; }
       .trust-divider { display: none; }
     }
+
+/* ══════════════════════════════════════════
+   melhoria de responsividade
+══════════════════════════════════════════ */
+
+  @media (max-width: 1024px) {
+    .hero {min-height: auto;padding: 140px 0 80px;}
+    .hero-inner {text-align: center;}
+    .hero-sub,
+    .section-sub {max-width: 100%;margin-left: auto;margin-right: auto;}
+    .hero-actions,
+    .hero-trust {justify-content: center;}
+    .hero-float-badge,
+    .hero-float-badge-2 {display: none;}
+    .cta-content {text-align: center;max-width: 100%;}
+    .cta-actions {width: 100%;max-width: 420px;}
+  }
+
+  @media (max-width: 768px) {
+    .section-title,
+    .hero-title,
+    .cta-title {line-height: 1.15;}
+    .features-section,
+    .cta-section {padding: 80px 0;}
+    .features-header {margin-bottom: 50px;}
+    .feature-row {margin-bottom: 70px;}
+    .hero-dashboard {max-width: 100%;}
+    .db-stats {grid-template-columns: 1fr;}
+    .hero-actions {flex-direction: column; align-items: stretch;}
+    .hero-actions a,
+    .hero-actions button,
+    .btn-primary-lg,
+    .btn-outline-lg {width: 100%; justify-content: center;}
+    .cta-actions {max-width: 100%;}
+    .btn-cta-primary,
+    .btn-cta-ghost {width: 100%; justify-content: center;}
+    .footer-bottom {flex-direction: column; text-align: center;}
+    .footer-legal { flex-wrap: wrap;justify-content: center;}
+  }
+
+  @media (max-width: 480px) {
+    .container,
+    .nav-inner {padding-left: 16px;padding-right: 16px;}
+    .hero {padding-top: 120px;}
+    .hero-title {font-size: 2.2rem;}
+    .section-title {font-size: 1.9rem;}
+    .hero-sub,
+    .section-sub {font-size: 0.95rem;line-height: 1.7;}
+    .hero-badge {width: 100%;justify-content: center;}
+    .dashboard-body {padding: 18px;}
+    .db-header {flex-direction: column;gap: 10px;align-items: flex-start;}
+    .feature-visual-inner {width: 92%;}
+    .fv-row {flex-direction: column;}
+    .hero-trust {flex-direction: column;align-items: flex-start;}
+    .cta-inner {padding: 32px 20px;}
+    .mobile-menu {padding: 90px 20px 60px;}
+  }
