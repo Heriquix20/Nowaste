@@ -50,7 +50,7 @@ O sistema busca apoiar negócios que precisam de um controle mais eficiente sobr
 
 | Integrante | Função |
 |---|---|
-| Gabriel Felipe | Product Owner / Frontend |
+| Gabriel Felipe | Product Owner |
 | Isadora Rodrigues | Frontend |
 | Wesley Carvalho | Scrum Master |
 | Henrique Cezar | Backend |
@@ -86,12 +86,12 @@ O sistema busca apoiar negócios que precisam de um controle mais eficiente sobr
 
 Antes de executar a aplicação, tenha instalado:
 
-| Ferramenta | Requisito |
-|---|---|
-| Java | JDK 26 |
-| Maven | compatível com o projeto |
-| MySQL | ambiente local |
-| Git | versão atual |
+| Ferramenta | Requisito                    |
+|---|------------------------------|
+| Java | JDK 21                       |
+| Maven | compatível com o projeto     |
+| MySQL | ambiente local               |
+| Git | versão atual                 |
 | IDE | IntelliJ, Eclipse ou VS Code |
 
 ### Conferindo a instalação
@@ -173,11 +173,11 @@ spring.jpa.properties.hibernate.format_sql=true
 
 ## 🧱 Organização do projeto
 
-```text
+```
 noWaste/
-├── pom.xml                       # dependências e configurações do Maven
-├── mvnw                          # Maven Wrapper (Linux/macOS)
-├── mvnw.cmd                      # Maven Wrapper (Windows)
+├── pom.xml                               # dependências e configurações do Maven
+├── mvnw                                  # Maven Wrapper (Linux/macOS)
+├── mvnw.cmd                              # Maven Wrapper (Windows)
 ├── src/
 │   ├── main/
 │   │   ├── java/A3/project/noWaste/
@@ -193,16 +193,44 @@ noWaste/
 │   │   │   ├── service/impl/             # implementações das regras de negócio
 │   │   │   └── ui/                       # controllers / endpoints da API
 │   │   └── resources/
-│   │       ├── application.properties    # configuração principal
-│   │       └── application-local.properties # configuração do ambiente local
+│   │       ├── application.properties
+│   │       └── application-local.properties
+│   │
 │   └── test/
-│       └── java/A3/project/noWaste/
-│           ├── NoWasteApplicationTests.java # teste de contexto da aplicação
-│           ├── domain/
-│           │   └── BatchTest.java           # testes da entidade Batch
-│           └── service/
-│               └── impl/                    # testes das implementações de serviço
-└── README.md                    # documentação do projeto
+│       ├── java/A3/project/noWaste/
+│       │   ├── bdd/
+│       │   │   ├── steps/
+│       │   │   │   ├── AlertSteps.java
+│       │   │   │   ├── BatchSteps.java
+│       │   │   │   ├── CommonSteps.java
+│       │   │   │   ├── Hooks.java
+│       │   │   │   └── ProductSteps.java
+│       │   │   │
+│       │   │   ├── support/
+│       │   │   │   ├── BDDContext.java
+│       │   │   │   ├── CucumberSpringConfiguration.java
+│       │   │   │   └── CucumberTest.java
+│       │   │
+│       │   ├── domain/
+│       │   │   └── BatchTest.java
+│       │   │
+│       │   ├── service/
+│       │   │   └── impl/
+│       │   │       └── VerificationServiceTest.java
+│       │   │
+│       │   ├── ui/
+│       │   │   ├── InventoryControllerTest.java
+│       │   │   └── ProductControllerTest.java
+│       │   │
+│       │   └── NoWasteApplicationTests.java
+│       │
+│       └── resources/
+│           └── features/
+│               ├── alerts.feature
+│               ├── batches.feature
+│               └── products.feature
+│
+└── README.md                             # documentação do projeto
 ```
 
 ### Papel de cada camada
@@ -276,6 +304,7 @@ Esses valores são definidos conforme a proximidade da data de vencimento.
 A API já possui consultas para:
 
 - lotes vencidos
+- lotes que vencem nos próximos 7 dias
 - lotes que vencem no mês atual
 
 ---
@@ -321,6 +350,7 @@ Base:
 
 | Método | Rota |
 |---|---|
+| GET | `/products` |
 | GET | `/inventories/{inventoryId}/products` |
 | GET | `/inventories/{inventoryId}/products/{productId}` |
 | POST | `/inventories/{inventoryId}/products` |
@@ -360,21 +390,25 @@ Filtros:
 
 ### Alertas
 
-| Método | Rota | Objetivo |
-|---|---|---|
-| GET | `/alerts/month` | lotes que vencem no mês |
-| GET | `/alerts/expired` | lotes já vencidos |
+| Método | Rota              | Objetivo                       |
+|---|-------------------|--------------------------------|
+| GET | `/alerts/month`   | lotes que vencem no mês        |
+| GET | `/alerts/week`    | lotes que vencem nos próximos 7 dias |
+| GET | `/alerts/expired` | lotes já vencidos              |
+
 
 ---
 
 ## 🧪 Testes automatizados
 
-O projeto já conta com estrutura inicial de testes utilizando **JUnit 5** e **Mockito**.
+O projeto conta com testes unitários, testes de controllers e testes BDD utilizando JUnit 5, Mockito e Cucumber.
 
 Arquivos encontrados:
-- `BatchTest.java`
-- `BatchImplTest.java`
-- `ProductImplTest.java`
+- BatchTest.java
+- VerificationServiceTest.java
+- InventoryControllerTest.java
+- ProductControllerTest.java
+- CucumberTest.java
 
 ### Executar testes
 
@@ -395,7 +429,54 @@ Arquivos encontrados:
 - cálculo de status dos lotes
 - conversão de peso
 - validação de filtros
-- comportamentos importantes das regras de negócio
+- endpoints de inventário
+- endpoints de produto
+- validações do serviço de autenticação
+- cenários BDD de negócio
+
+---
+
+## 🥒 Testes BDD
+
+O projeto utiliza **Cucumber** para validar regras de negócio através de cenários BDD.
+
+Estrutura principal:
+
+```text
+bdd/
+├── steps/
+├── support/
+└── CucumberTest.java
+```
+
+Cenários cobertos:
+
+- gerenciamento de produtos
+- gerenciamento de lotes
+- alertas de vencimento
+- validações de regras de negócio
+
+---
+
+## Cobertura de testes com JaCoCo
+
+Gerar relatório:
+
+```bash
+./mvnw clean verify
+```
+
+Windows:
+
+```bash
+.\mvnw.cmd clean verify
+```
+
+Caso esteja utilizando Windows, o relatório também pode ser aberto utilizando:
+
+```bash
+open-jacoco-report.bat
+```
 
 ---
 
@@ -477,15 +558,18 @@ ou no Windows:
 O projeto foi configurado com:
 
 ```xml
-<java.version>26</java.version>
+<java.version>21</java.version>
 ```
 ---
 
 ## 📌 Situação atual
 
 - Sprint 0 concluída
-- Sprint 1 estruturada com MVP funcional
-- testes iniciais já adicionados
+- Sprint 1 concluída
+- Sprint 2 concluída
+- testes unitários implementados
+- testes BDD implementados
+- cobertura de testes com JaCoCo
 - projeto em evolução para próximas entregas/Sprints
 
 ---
