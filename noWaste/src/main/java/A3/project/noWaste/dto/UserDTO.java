@@ -16,7 +16,7 @@ public class UserDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O username é obrigatório")
+    @NotBlank(message = "O nome é obrigatório")
     private String name;
 
     @NotBlank(message = "O email é obrigatório")
