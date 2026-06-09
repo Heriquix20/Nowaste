@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                         .requestMatchers("/inventories/**").permitAll()
+                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/alerts/**").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
