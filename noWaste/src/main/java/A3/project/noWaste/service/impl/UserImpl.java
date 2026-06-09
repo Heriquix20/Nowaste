@@ -7,7 +7,6 @@ import A3.project.noWaste.infra.UserRepository;
 import A3.project.noWaste.service.UserService;
 import A3.project.noWaste.exceptions.DataIntegratyViolationException;
 import A3.project.noWaste.service.VerificationService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,9 +16,6 @@ import java.util.Optional;
 
 @Service
 public class UserImpl implements UserService {
-
-    @Autowired
-    private ModelMapper mapper;
 
     @Autowired
     private UserRepository repository;
