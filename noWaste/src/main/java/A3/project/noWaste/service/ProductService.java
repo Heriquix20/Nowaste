@@ -19,6 +19,8 @@ public interface ProductService {
             String sortWeight
     );
 
+    List<Product> findAllByUser();
+
     Product create(Integer inventoryId, ProductDTO obj);
 
     Product update(Integer inventoryId, Integer productId, ProductDTO obj);

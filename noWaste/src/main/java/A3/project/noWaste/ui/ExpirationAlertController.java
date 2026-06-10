@@ -25,6 +25,12 @@ public class ExpirationAlertController {
         return ResponseEntity.ok(service.findBatchesExpiringThisMonth());
     }
 
+    // lotes que vencem nos proximos 7 dias
+    @GetMapping("/alerts/week")
+    public ResponseEntity<List<ExpirationAlertDTO>> findBatchesExpiringIn7Days() {
+        return ResponseEntity.ok(service.findBatchesExpiringIn7Days());
+    }
+
     // lotes ja vencidos
     @GetMapping("/alerts/expired")
     public ResponseEntity<List<ExpirationAlertDTO>> findExpiredBatches() {

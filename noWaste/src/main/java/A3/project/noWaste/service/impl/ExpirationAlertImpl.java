@@ -41,6 +41,23 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
                 .collect(Collectors.toList());
     }
 
+    // lotes que vencem daqui 7 dias
+    @Override
+    public List<ExpirationAlertDTO> findBatchesExpiringIn7Days() {
+        Integer userId = verificationService.getUserId();
+        LocalDate today = LocalDate.now();
+        LocalDate limitDate = today.plusDays(7);
+
+        return batchRepository.findAll().stream()
+                .filter(batch -> belongsToUser(batch, userId))
+                .filter(batch -> batch.getExpirationDate() != null)
+                .filter(batch -> !batch.getExpirationDate().isBefore(today))
+                .filter(batch -> !batch.getExpirationDate().isAfter(limitDate))
+                .sorted(Comparator.comparing(Batch::getExpirationDate))
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     // lotes do usuario que ja venceram
     @Override
     public List<ExpirationAlertDTO> findExpiredBatches() {

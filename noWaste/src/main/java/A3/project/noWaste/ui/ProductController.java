@@ -25,6 +25,18 @@ public class ProductController {
         this.mapper = mapper;
     }
 
+
+    // listar todos os produtos de um usuário
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductDTO>> findAllByUser() {
+        List<Product> list = service.findAllByUser();
+        List<ProductDTO> listDTO = list.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(listDTO);
+    }
+
     // listar produtos e filtrar por nome, categoria, marca, peso e ordenação por peso
     @GetMapping("/inventories/{inventoryId}/products")
     public ResponseEntity<List<ProductDTO>> findAllByInventory(
