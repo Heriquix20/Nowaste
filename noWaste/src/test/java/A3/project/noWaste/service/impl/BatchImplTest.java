@@ -278,4 +278,67 @@ class BatchImplTest {
         batch.setProduct(product);
         return batch;
     }
+
+    @Test
+    void shouldSortBatchesByExpirationDateAscendingWhenRequested() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+
+        Product product = createProduct(productId, "Arroz", userId);
+        LocalDate today = LocalDate.now();
+
+        Batch later = createBatch(2, "LT-ARROZ-002", 10, today.plusDays(10), product);
+        Batch earlier = createBatch(1, "LT-ARROZ-001", 10, today.plusDays(3), product);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId))
+                .thenReturn(Optional.of(product));
+        when(repository.findByProductId(productId))
+                .thenReturn(List.of(later, earlier));
+
+        List<Batch> result = service.findAllByProduct(
+                inventoryId, productId,
+                null, null, null, null, null, null, "asc"
+        );
+
+        assertEquals(List.of(earlier, later), result);
+    }
+
+    @Test
+    void shouldThrowWhenProductDoesNotExistInInventory() {
+        when(verificationService.getUserId()).thenReturn(1);
+
+        when(productRepository.findByIdAndInventoryId(100, 10))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> service.findAllByProduct(
+                        10, 100,
+                        null, null, null, null, null, null, null
+                )
+        );
+    }
+
+    @Test
+    void shouldThrowWhenBatchNotFound() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+        Integer productId = 100;
+
+        Product product = createProduct(productId, "Arroz", userId);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(productRepository.findByIdAndInventoryId(productId, inventoryId))
+                .thenReturn(Optional.of(product));
+
+        when(repository.findByIdAndProductId(50, productId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> service.findById(inventoryId, productId, 50)
+        );
+    }
 }
