@@ -27,14 +27,29 @@ public class VerificationService {
     }
 
 
+//    public Integer getUserId() {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (auth == null || auth.getPrincipal() == null) {
+//            throw new UserNotFoundException("Usuário não autenticado");
+//        }
+//        JWTUserData userData = (JWTUserData) auth.getPrincipal();
+//        return userData.getUserId();
+//    }
     public Integer getUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || auth.getPrincipal() == null) {
             throw new UserNotFoundException("Usuário não autenticado");
         }
-        JWTUserData userData = (JWTUserData) auth.getPrincipal();
-        return userData.getUserId();
+
+        // Valida se o que está lá dentro realmente é a sua classe JWTUserData
+        if (auth.getPrincipal() instanceof JWTUserData userData) {
+            return userData.getUserId();
+        }
+
+        // Se for uma String (ex: "anonymousUser"), significa que não há usuário real autenticado
+        throw new UserNotFoundException("Usuário não autenticado ou sessão inválida");
     }
 
     public User verifyUser() {
