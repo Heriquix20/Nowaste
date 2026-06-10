@@ -261,4 +261,157 @@ class ProductImplTest {
         product.setWeightInGrams(weightInGrams);
         return product;
     }
+
+    @Test
+    void shouldReturnAllProductsFromAuthenticatedUser() {
+        Integer userId = 1;
+
+        Product product = createProduct(
+                1,
+                "Arroz",
+                "Graos",
+                "Marca",
+                1000.0
+        );
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(repository.findByInventoryUserId(userId))
+                .thenReturn(List.of(product));
+
+        List<Product> result = service.findAllByUser();
+
+        assertEquals(1, result.size());
+        assertEquals("Arroz", result.get(0).getName());
+    }
+
+    @Test
+    void shouldSortProductsByWeightAscending() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+
+        Inventory inventory = new Inventory();
+        inventory.setId(inventoryId);
+
+        Product p1 = createProduct(1, "A", "Cat", "Marca", 1000.0);
+        Product p2 = createProduct(2, "B", "Cat", "Marca", 500.0);
+        Product p3 = createProduct(3, "C", "Cat", "Marca", 1500.0);
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(inventoryRepository.findByIdAndUserId(inventoryId, userId))
+                .thenReturn(Optional.of(inventory));
+        when(repository.findByInventoryId(inventoryId))
+                .thenReturn(List.of(p1, p2, p3));
+
+        List<Product> result =
+                service.findAllByInventory(inventoryId, null, null, null, null, null, "asc");
+
+        assertEquals(List.of(p2, p1, p3), result);
+    }
+
+    @Test
+    void shouldUpdateProductKeepingSameName() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+
+        Product existing = createProduct(
+                100,
+                "Arroz",
+                "Graos",
+                "Marca",
+                1000.0
+        );
+
+        Inventory inventory = new Inventory();
+        inventory.setId(inventoryId);
+
+        ProductDTO dto = new ProductDTO();
+        dto.setName("Arroz");
+        dto.setWeight(1.0);
+        dto.setWeightUnit("kg");
+        dto.setCategory("Graos");
+        dto.setBrand("Marca");
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(inventoryRepository.findByIdAndUserId(inventoryId, userId))
+                .thenReturn(Optional.of(inventory));
+        when(repository.findByIdAndInventoryId(100, inventoryId))
+                .thenReturn(Optional.of(existing));
+        when(repository.findByInventoryId(inventoryId))
+                .thenReturn(List.of(existing));
+        when(repository.save(existing))
+                .thenReturn(existing);
+
+        Product result = service.update(inventoryId, 100, dto);
+
+        assertEquals("Arroz", result.getName());
+    }
+
+    @Test
+    void shouldThrowWhenInventoryDoesNotBelongToUser() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(inventoryRepository.findByIdAndUserId(inventoryId, userId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                ObjectNotFoundException.class,
+                () -> service.findById(inventoryId, 1)
+        );
+    }
+
+    @Test
+    void shouldThrowWhenWeightUnitIsNull() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+
+        Inventory inventory = new Inventory();
+        inventory.setId(inventoryId);
+
+        ProductDTO dto = new ProductDTO();
+        dto.setName("Arroz");
+        dto.setWeight(1.0);
+        dto.setWeightUnit(null);
+        dto.setCategory("Graos");
+        dto.setBrand("Marca");
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(inventoryRepository.findByIdAndUserId(inventoryId, userId))
+                .thenReturn(Optional.of(inventory));
+        when(repository.findByInventoryId(inventoryId))
+                .thenReturn(Collections.emptyList());
+
+        assertThrows(
+                DataIntegratyViolationException.class,
+                () -> service.create(inventoryId, dto)
+        );
+    }
+
+    @Test
+    void shouldThrowWhenWeightUnitIsInvalid() {
+        Integer userId = 1;
+        Integer inventoryId = 10;
+
+        Inventory inventory = new Inventory();
+        inventory.setId(inventoryId);
+
+        ProductDTO dto = new ProductDTO();
+        dto.setName("Arroz");
+        dto.setWeight(1.0);
+        dto.setWeightUnit("lb");
+        dto.setCategory("Graos");
+        dto.setBrand("Marca");
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(inventoryRepository.findByIdAndUserId(inventoryId, userId))
+                .thenReturn(Optional.of(inventory));
+        when(repository.findByInventoryId(inventoryId))
+                .thenReturn(Collections.emptyList());
+
+        assertThrows(
+                DataIntegratyViolationException.class,
+                () -> service.create(inventoryId, dto)
+        );
+    }
 }
