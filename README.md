@@ -21,15 +21,14 @@
 - [Equipe](#-equipe)
 - [Stack utilizada](#-stack-utilizada)
 - [Arquitetura da solução](#-arquitetura-da-solução)
-- [Funcionalidades implementadas na Sprint 2](#-funcionalidades-implementadas-na-sprint-2)
+- [Funcionalidades implementadas na Sprint 2](#-funcionalidades-implementadas)
 - [Frontend implementado](#-frontend-implementado)
 - [Backend implementado](#-backend-implementado)
 - [Rotas da API](#-rotas-da-api)
 - [Testes automatizados](#-testes-automatizados)
 - [Evidências visuais](#-evidências-visuais)
 - [Como executar o projeto](#-como-executar-o-projeto)
-- [Status da Sprint 2](#-status-da-sprint-2)
-- [Próximos passos](#-próximos-passos)
+- [Status do projeto](#-status-do-projeto-na-sprint-2)
 - [Licença](#-licença)
 
 ---
