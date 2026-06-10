@@ -1,4 +1,4 @@
-# 📦 noWaste — Controle Inteligente de Estoque por Lote e Validade
+#  📦 noWaste — Controle Inteligente de Estoque 
 
 <p align="center">
   <strong>Sistema fullstack para gestão de inventários, produtos, lotes e alertas de vencimento.</strong>
