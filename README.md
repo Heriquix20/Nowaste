@@ -45,7 +45,11 @@ Usuário → Inventário → Produto → Lote → Alertas de validade
 
 Essa estrutura permite que cada produto seja organizado dentro de um inventário e que cada lote tenha quantidade, validade, peso total calculado e status automático de vencimento.
 
----
+- qual produto está armazenado
+- em qual inventário ele está
+- qual a quantidade disponível
+- quando esse lote vence
+- qual o status atual da validade
 
 ## 🎯 Problema e proposta de valor
 
@@ -608,6 +612,32 @@ export const api = axios.create({
 });
 ```
 
+### Erro ao validar JWT
+Revise o valor configurado em:
+
+```properties
+TOKEN_SECRET
+```
+
+### Erro no build Maven
+Tente executar:
+
+```bash
+./mvnw clean install
+```
+
+ou no Windows:
+
+```bash
+.\mvnw.cmd clean install
+```
+
+### Problema com versão do Java
+O projeto foi configurado com:
+
+```xml
+<java.version>26</java.version>
+```
 ---
 
 ## 📌 Status do projeto na Sprint 2
