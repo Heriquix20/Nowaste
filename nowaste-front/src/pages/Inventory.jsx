@@ -1,252 +1,238 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./templatemo-622-clearwave.css";
-import IconEdit from "../assets/images/icons/edit.svg"; 
-import IconDelete from "../assets/images/icons/delete.svg";
+import { api } from "./services/api.js";
+
+import IconAlert from "../assets/images/icons/warning.png";
+import IconBox from "../assets/images/icons/package.png";
 
 export default function Inventory() {
-    const [user, setUser] = useState(null);
     const navigate = useNavigate();
+    const [user, setUser] = useState(null);
 
-    // Recupera os dados do usuário salvos no localStorage pelo login
+    const [expiredBatches, setExpiredBatches] = useState([]);
+    const [warningBatches, setWarningBatches] = useState([]);
+    const [metrics, setMetrics] = useState({ totalItems: 0, totalWeight: 0 });
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
             setUser(JSON.parse(storedUser));
+        } else {
+            navigate("/login");
         }
-    }, []);
 
-    // Função para deslogar do sistema
+        carregarDadosDashboard();
+    }, [navigate]);
+
+    async function carregarDadosDashboard() {
+        try {
+            setLoading(true);
+
+            const resExpired = await api.get("/alerts/expired");
+            const resMonth = await api.get("/alerts/month");
+
+            setExpiredBatches(resExpired.data || []);
+            setWarningBatches(resMonth.data || []);
+
+            let itensSomados = 0;
+            let pesoSomado = 0;
+
+            [...(resExpired.data || []), ...(resMonth.data || [])].forEach(batch => {
+                itensSomados += batch.quantity || 0;
+                pesoSomado += batch.totalWeight || (batch.quantity * (batch.productWeight || 0));
+            });
+
+            setMetrics({
+                totalItems: itensSomados,
+                totalWeight: pesoSomado
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar dados reais do Dashboard:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     function handleLogout() {
         localStorage.removeItem("user");
-        navigate("/");
-    }
-
-    // Estados para armazenar inventários, formulário e controle de edição
-    const [inventories, setInventories] = useState([]);
-    const [editingId, setEditingId] = useState(null); 
-    const [inventoryForm, setInventoryForm] = useState({
-        name: "",
-        description: "",
-        location: ""
-    });
-
-    // Função para carregar os inventários
-    useEffect(() => {
-        carregarInventarios();
-    }, []);
-
-    async function carregarInventarios() {
-        const data = [
-            { id: 1, name: "aaaaaaa", description: "etc", location: "local", createdAt: "2026-06-09T14:30:00" },
-            { id: 2, name: "bbbbbbbbb", description: "etc", location: "local", createdAt: "2026-06-08T10:15:00" },
-            { id: 3, name: "cccccccccc", description: "etc", location: "local", createdAt: "2026-06-07T09:00:00" },
-            { id: 4, name: "ddddddd", description: "etc", location: "local", createdAt: "2026-06-07T09:00:00" },
-        ];
-        setInventories(data);
-    }
-
-    function prepararEdicao(inventory) {
-        setInventoryForm({
-            name: inventory.name,
-            description: inventory.description,
-            location: inventory.location
-        });
-        setEditingId(inventory.id);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function cancelarEdicao() {
-        setInventoryForm({ name: "", description: "", location: "" });
-        setEditingId(null);
-    }
-
-    // Função para excluir o inventário
-    async function deletarInventario(id) {
-        const confirmacao = window.confirm("Tem certeza que deseja excluir este inventário?");
-        if (!confirmacao) return;
-
-        try {
-            const response = await fetch(`http://localhost:8080/inventories/${id}`, {
-                method: "DELETE",
-            });
-
-            if (!response.ok) {
-                throw new Error("Erro ao deletar inventário");
-            }
-
-            setInventories(prev => prev.filter(inv => inv.id !== id));
-            
-            if (editingId === id) cancelarEdicao();
-
-        } catch (error) {
-            console.error(error);
-            alert("Erro ao excluir inventário. Verifique o console.");
-        }
-    }
-
-    // Função para editar e salvar
-    async function salvarInventario(e) {
-        e.preventDefault();
-
-        try {
-            const url = editingId 
-                ? `http://localhost:8080/inventories/${editingId}` 
-                : "http://localhost:8080/inventories";
-            const method = editingId ? "PUT" : "POST";
-
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(inventoryForm)
-            });
-
-            if (!response.ok) {
-                throw new Error("Erro ao salvar inventário");
-            }
-
-            const savedInventory = await response.json();
-
-            if (editingId) {
-                setInventories(prev => prev.map(inv => inv.id === editingId ? savedInventory : inv));
-                setEditingId(null);
-            } else {
-                setInventories(prev => [...prev, savedInventory]);
-            }
-
-            setInventoryForm({ name: "", description: "", location: "" });
-
-        } catch (error) {
-            console.error(error);
-            alert("Erro ao salvar inventário");
-        }
+        navigate("/login");
     }
 
     return (
-        <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh", fontFamily: "var(--font-sans)" }}>
-            {/* HEADER */}
-            <nav className="nav" style={{ position: "static", background: "var(--surface)" }}>
-                <div className="nav-inner" style={{ padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                    <a href="/" className="nav-logo" style={{ margin: 0 }}>
-                        No<span>Waste</span>
-                    </a>
+        <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh", fontFamily: "var(--font-sans)", color: "var(--text-1)" }}>
 
-                    <div className="nav-cta" style={{ display: "flex", alignItems: "center", gap: "24px", margin: 0 }}>
-                        <span style={{ fontSize: "0.9rem", color: "var(--text-2)", fontWeight: "500", whiteSpace: "nowrap" }}>
-                            Olá, {user ? user.name : "Operador"}
+            {/* HEADER DESIGN COMPACTO */}
+            <nav className="nav" style={{ position: "static", background: "var(--surface)", borderBottom: "1px solid var(--border)", boxShadow: "none", height: "70px" }}>
+                <div className="nav-inner" style={{ padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", height: "100%" }}>
+                    <a href="/inventory" className="nav-logo" style={{ margin: 0, textDecoration: "none" }}>No<span>Waste</span></a>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                        <span style={{ fontSize: "0.9rem", color: "var(--text-2)", fontWeight: "500" }}>
+                            Olá, {user?.name ? user.name : "Operador"}
                         </span>
-
-                        <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: "700" }}>
-                            {user ? user.name.charAt(0).toUpperCase() : "O"}
+                        <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem", fontWeight: "700" }}>
+                            {user?.name ? user.name.charAt(0).toUpperCase() : "O"}
                         </div>
-
-                        <button onClick={handleLogout} className="btn-ghost" style={{ fontSize: "0.9rem", border: "none", background: "transparent", cursor: "pointer", padding: "6px 12px" }}>
+                        <button onClick={handleLogout} className="btn-ghost" style={{ padding: "6px 12px", fontSize: "0.85rem", border: "1px solid #d9534f", color: "#d9534f", borderRadius: "8px", background: "transparent", cursor: "pointer" }}>
                             Sair
                         </button>
                     </div>
                 </div>
             </nav>
 
-            {/* CONTEÚDO */}
-            <div className="container" style={{ padding: "60px 20px", maxWidth: "1200px", margin: "0 auto" }}>
-                
-                {/* TÍTULO */}
-                <div style={{ marginBottom: "32px" }}>
-                    <h1 style={{ color: "var(--text-1)", fontSize: "2rem", fontWeight: "700", margin: 0 }}>
-                        Painel de Inventários
-                    </h1>
-                    <p style={{ color: "var(--text-3)", fontSize: "1rem", marginTop: "6px", marginBottom: 0 }}>
-                        Gerencie seus inventários e produtos.
-                    </p>
+            {/* CONTEÚDO CENTRAL */}
+            <div className="container" style={{ padding: "40px 24px", maxWidth: "1200px", margin: "0 auto" }}>
+
+                {/* FILA DE INTRODUÇÃO */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: "2rem", fontWeight: "700" }}>Painel de Controle</h1>
+                        <p style={{ margin: "4px 0 0 0", color: "var(--text-3)", fontSize: "0.95rem" }}>Visão analítica de vencimentos e lotes sob monitoramento.</p>
+                    </div>
+                    <button
+                        className="btn-primary"
+                        onClick={() => navigate("/inventory/list")}
+                        style={{ borderRadius: "100px", padding: "12px 24px", fontWeight: "600", fontSize: "0.95rem" }}
+                    >
+                        Gerenciar Inventários →
+                    </button>
                 </div>
 
-                {/* FORMULÁRIO */}
-                <div style={{ background: "var(--surface)", padding: "32px", borderRadius: "24px", boxShadow: "var(--shadow-sm)", marginBottom: "32px"}}>
-                    <h2 style={{ marginTop: 0, marginBottom: "24px", color: "var(--text-1)" }}>
-                        <img src="nowaste-front\src\assets\images\icons\delete.svg" alt="" />
-                        {editingId ? "Editar Inventário" : "Novo Inventário"}
-                    </h2>
+                {/* DASHBOARD GRID: MÉTRICAS RÁPIDAS COM ICONES PNG */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px", marginBottom: "40px" }}>
 
-                    <form onSubmit={salvarInventario} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                        <input className="input" type="text" required placeholder="Nome do inventário" value={inventoryForm.name} onChange={(e) => setInventoryForm({ ...inventoryForm, name: e.target.value })} />
-                        <input className="input" type="text" required placeholder="Localização" value={inventoryForm.location} onChange={(e) => setInventoryForm({ ...inventoryForm, location: e.target.value })} />
-                        <textarea className="textarea" placeholder="Descrição" rows={4} value={inventoryForm.description} onChange={(e) => setInventoryForm({ ...inventoryForm, description: e.target.value })} />
-
-                        <div style={{ display: "flex", gap: "16px" }}>
-                            <button className="btn-primary" type="submit" style={{ flex: 1 }}>
-                                {editingId ? "Atualizar Inventário" : "Criar Inventário"}
-                            </button>
-                            
-                            {/* Botão de cancelar aparece apenas se estiver no modo de edição */}
-                            {editingId && (
-                                <button type="button" onClick={cancelarEdicao} style={{ flex: 1, padding: "12px", borderRadius: "8px", background: "#f0f0f0", color: "#333", border: "none", cursor: "pointer", fontWeight: "600" }}>
-                                    Cancelar Edição
-                                </button>
-                            )}
+                    {/* CARD 1: ITENS CRÍTICOS */}
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
+                        <div style={{ background: "rgba(217, 83, 79, 0.08)", padding: "12px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <img src={IconAlert} alt="Alerta" width="28" height="28" />
                         </div>
-                    </form>
+                        <div>
+                            <div style={{ color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>Itens Críticos</div>
+                            <div style={{ color: "var(--text-1)", fontSize: "1.8rem", fontWeight: "700", marginTop: "4px" }}>
+                                {metrics.totalItems} <span style={{ fontSize: "0.9rem", color: "var(--text-3)", fontWeight: "500" }}>unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CARD 2: VOLUME MONITORADO */}
+                    <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
+                        <div style={{ background: "rgba(84, 124, 162, 0.08)", padding: "12px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <img src={IconBox} alt="Estoque" width="28" height="28" />
+                        </div>
+                        <div>
+                            <div style={{ color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>Volume Monitorado</div>
+                            <div style={{ color: "var(--accent)", fontSize: "1.8rem", fontWeight: "700", marginTop: "4px" }}>
+                                {metrics.totalWeight >= 1000
+                                    ? `${(metrics.totalWeight / 1000).toFixed(2)} kg`
+                                    : `${metrics.totalWeight} g`
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                {/* LISTA DE INVENTÁRIOS */}
-                <div style={{ background: "var(--surface)", padding: "32px", borderRadius: "24px", boxShadow: "var(--shadow-sm)", marginBottom: "32px" }}>
-                    <h2 style={{ marginTop: 0, marginBottom: "24px", paddingBottom: "16px", borderBottom: "1px solid #eaeaea", color: "var(--text-1)" }}>
-                        Inventários Cadastrados
-                    </h2>
 
-                    {inventories.length === 0 ? (
-                        <div style={{ background: "var(--bg)", padding: "48px 24px", borderRadius: "16px", textAlign: "center", color: "var(--text-3)", border: "2px dashed #eaeaea" }}>
-                            Nenhum inventário cadastrado no momento.
+                {/* TABELAS ANALÍTICAS */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+
+                    {/* TABELA 1: VENCIDOS */}
+                    <div style={{ background: "var(--surface)", padding: "28px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid rgba(217, 83, 79, 0.15)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+                            <span style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#d9534f" }}></span>
+                            <h2 style={{ margin: 0, color: "#d9534f", fontSize: "1.25rem", fontWeight: "700" }}>Produtos Vencidos</h2>
                         </div>
-                    ) : (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
-                            {inventories.map((inventory) => (
-                                <div key={inventory.id} style={{ background: "var(--bg)", padding: "24px", borderRadius: "16px", boxShadow: "var(--shadow-sm)", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #f0f0f0" }}>
-                                    <div>
-                                        <h3 style={{ marginTop: 0, marginBottom: "12px", color: "var(--text-1)", fontSize: "1.25rem" }}>
-                                            {inventory.name}
-                                        </h3>
 
-                                        <p style={{ margin: "0 0 8px 0", color: "var(--text-2)", fontSize: "0.95rem" }}>
-                                            <strong style={{ color: "var(--text-1)" }}>Local:</strong> {inventory.location}
-                                        </p>
+                        {expiredBatches.length === 0 ? (
+                            <div style={{ background: "rgba(92, 184, 92, 0.06)", padding: "20px", borderRadius: "12px", textAlign: "center", color: "#5cb85c", fontWeight: "600", fontSize: "0.95rem" }}>
+                                ✓ Nenhum lote vencido detectado no sistema.
+                            </div>
+                        ) : (
+                            <div style={{ overflowX: "auto" }}>
+                                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                                    <thead>
+                                    <tr style={{ borderBottom: "2px solid var(--border)", color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600" }}>
+                                        <th style={{ padding: "12px 16px" }}>Produto / Descrição</th>
+                                        <th style={{ padding: "12px 16px" }}>Cód. Lote</th>
+                                        <th style={{ padding: "12px 16px" }}>Qtd</th>
+                                        <th style={{ padding: "12px 16px" }}>Data de Validade</th>
+                                        <th style={{ padding: "12px 16px" }}>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {expiredBatches.map(batch => (
+                                        <tr key={batch.batchId} style={{ borderBottom: "1px solid var(--border)", fontSize: "0.95rem" }}>
+                                            <td style={{ padding: "16px", fontWeight: "600" }}>{batch.productName}</td>
+                                            <td style={{ padding: "16px" }}>
+                                                <code style={{ background: "var(--bg)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.85rem", border: "1px solid var(--border)" }}>
+                                                    {batch.batchCode || `Lote #${batch.batchId}`}
+                                                </code>
+                                            </td>
+                                            <td style={{ padding: "16px", fontWeight: "500" }}>{batch.quantity}</td>
+                                            <td style={{ padding: "16px" }}>
+                                                {batch.expirationDate ? new Date(batch.expirationDate + "T00:00:00").toLocaleDateString("pt-BR") : "-"}
+                                            </td>
+                                            <td style={{ padding: "16px", color: "#d9534f", fontWeight: "600" }}>
+                                                Vencido há {Math.abs(batch.daysToExpire)} dias
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
 
-                                        {inventory.description && (
-                                            <p style={{ margin: 0, color: "var(--text-3)", fontSize: "0.9rem", lineHeight: "1.5" }}>
-                                                {inventory.description}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "24px", paddingTop: "16px", borderTop: "1px solid #eaeaea" }}>
-                                        <small style={{ color: "var(--text-3)", fontSize: "0.8rem", textAlign: "center" }}>
-                                            {inventory.createdAt && new Date(inventory.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                                        </small>
-
-                                        <div style={{ display: "flex", gap: "8px" }}>
-                                            <button 
-                                                onClick={() => prepararEdicao(inventory)} 
-                                                style={{ flex: 1, padding: "8px", borderRadius: "6px", background: "#547ca2", color: "var(--text-1)", cursor: "pointer", fontWeight: "600", display: "flex", justifyContent: "center", alignItems: "center" }}
-                                            >
-                                                <img src={IconEdit} alt="editar" width="20" height="20" />
-                                            </button>
-                                            
-                                            <button 
-                                                onClick={() => deletarInventario(inventory.id)} 
-                                                style={{ flex: 1, padding: "8px", borderRadius: "6px", background: "#a14646", color: "#dc2626", cursor: "pointer", fontWeight: "600", display: "flex", justifyContent: "center", alignItems: "center" }}
-                                            >
-                                                <img src={IconDelete} alt="excluir" width="20" height="20" />
-                                            </button>
-                                        </div>
-
-                                        <button className="btn-primary" onClick={() => navigate(`/inventory/${inventory.id}`)} style={{ width: "100%", padding: "12px", borderRadius: "8px", fontWeight: "600", marginTop: "4px" }}>
-                                            Ver Produtos
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                    {/* TABELA 2: EM ALERTA NO MÊS */}
+                    <div style={{ background: "var(--surface)", padding: "28px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid rgba(240, 173, 78, 0.15)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+                            <span style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#f0ad4e" }}></span>
+                            <h2 style={{ margin: 0, color: "#f0ad4e", fontSize: "1.25rem", fontWeight: "700" }}>Alertas de Validade (Mês Atual)</h2>
                         </div>
-                    )}
+
+                        {warningBatches.length === 0 ? (
+                            <div style={{ background: "var(--bg)", padding: "20px", borderRadius: "12px", textAlign: "center", color: "var(--text-3)", fontSize: "0.95rem" }}>
+                                Nenhum produto com vencimento próximo para este mês.
+                            </div>
+                        ) : (
+                            <div style={{ overflowX: "auto" }}>
+                                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                                    <thead>
+                                    <tr style={{ borderBottom: "2px solid var(--border)", color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600" }}>
+                                        <th style={{ padding: "12px 16px" }}>Produto</th>
+                                        <th style={{ padding: "12px 16px" }}>Cód. Lote</th>
+                                        <th style={{ padding: "12px 16px" }}>Qtd</th>
+                                        <th style={{ padding: "12px 16px" }}>Data de Validade</th>
+                                        <th style={{ padding: "12px 16px" }}>Tempo Restante</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {warningBatches.map(batch => {
+                                        const critical = batch.daysToExpire <= 7;
+                                        return (
+                                            <tr key={batch.batchId} style={{ borderBottom: "1px solid var(--border)", fontSize: "0.95rem" }}>
+                                                <td style={{ padding: "16px", fontWeight: "600" }}>{batch.productName}</td>
+                                                <td style={{ padding: "16px" }}>
+                                                    <code style={{ background: "var(--bg)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.85rem", border: "1px solid var(--border)" }}>
+                                                        {batch.batchCode || `Lote #${batch.batchId}`}
+                                                    </code>
+                                                </td>
+                                                <td style={{ padding: "16px", fontWeight: "500" }}>{batch.quantity}</td>
+                                                <td style={{ padding: "16px" }}>
+                                                    {batch.expirationDate ? new Date(batch.expirationDate + "T00:00:00").toLocaleDateString("pt-BR") : "-"}
+                                                </td>
+                                                <td style={{ padding: "16px", fontWeight: "600", color: critical ? "#e67e22" : "#31708f" }}>
+                                                    {batch.daysToExpire >= 0 ? `Faltam ${batch.daysToExpire} dias` : "Vence este mês"}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
             </div>
         </div>

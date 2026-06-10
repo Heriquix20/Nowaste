@@ -5,6 +5,7 @@ import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx"
 import Inventory from "./pages/Inventory.jsx"
 import InventoryProducts from "./pages/InventoryProducts.jsx";
+import InventoryList from "./pages/InventoryList.jsx";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/inventory" element={<Inventory />} />
+                <Route path="/inventory/list" element={<InventoryList />} />
                 <Route path="/inventory/:inventoryId" element={<InventoryProducts />}/>
             </Routes>
         </BrowserRouter>

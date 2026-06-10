@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "./services/api.js";
-import { useNavigate } from "react-router-dom"; // 1. IMPORTA O NAVIGATE
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./templatemo-622-clearwave.css";
 
 export default function Login() {
@@ -8,38 +9,38 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [alertMessage, setAlertMessage] = useState({ text: "", type: "" });
 
-    const navigate = useNavigate(); // 2. INICIALIZA O HOOK
-
+    const navigate = useNavigate();
     async function handleLogin(e) {
         e.preventDefault();
         setAlertMessage({ text: "", type: "" });
 
         try {
-            const res = await api.get("/users");
-            const user = res.data.find((u) => u.email === email);
+            const res = await api.post("/auth/login", { email, password });
 
-            if (user) {
-                setAlertMessage({ text: "Login realizado com sucesso! Redirecionando...", type: "success" });
-                localStorage.setItem("user", JSON.stringify(user));
+            const token = res.data.token;
+            const userLogged = {
+                id: res.data.id,
+                name: res.data.name,
+                email: res.data.email,
+                token: token
+            };
 
-                // 3. SE LOGOU, AGUARDA 1.5 SEGUNDOS (PRO USUÁRIO VER O ALERTA BONITO) E REDIRECIONA
-                setTimeout(() => {
-                    navigate("/inventory");
-                }, 1500);
+            setAlertMessage({ text: "Login realizado com sucesso! Redirecionando...", type: "success" });
+            localStorage.setItem("user", JSON.stringify(userLogged));
 
-            } else {
-                setAlertMessage({ text: "Usuário não encontrado. Verifique suas credenciais.", type: "error" });
-            }
+            setTimeout(() => {
+                navigate("/inventory");
+            }, 1500);
+
         } catch (err) {
             console.error(err);
-            setAlertMessage({ text: "Erro ao realizar o login. Tente novamente.", type: "error" });
+            setAlertMessage({ text: "E-mail ou senha incorretos. Tente novamente.", type: "error" });
         }
     }
 
     return (
         <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh", fontFamily: "var(--font-sans)" }}>
 
-            {/* NAV BAR CORRIGIDA COM AS REGRAS DE ESPALHAMENTO DA HOME */}
             <nav className="nav" style={{ position: "static", background: "var(--surface)" }}>
                 <div className="nav-inner" style={{ padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                     <a href="/" className="nav-logo" style={{ margin: 0 }}>No<span>Waste</span></a>
