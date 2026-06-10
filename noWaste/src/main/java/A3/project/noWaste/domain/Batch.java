@@ -23,7 +23,7 @@ public class Batch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String code;
 
     @NotNull(message = "A quantidade e obrigatoria")
