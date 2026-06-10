@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper()
+            .findAndRegisterModules();
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
