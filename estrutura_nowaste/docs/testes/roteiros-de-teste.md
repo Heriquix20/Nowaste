@@ -106,4 +106,3 @@ Documento atualizado com base no que foi implementado, evidenciado e enviado at√
 <img width="1600" height="834" alt="image" src="https://github.com/user-attachments/assets/7979c013-b658-4c8b-b334-f315fd4729e0" />
 
 ---
-
