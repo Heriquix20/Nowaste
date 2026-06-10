@@ -116,4 +116,78 @@ class ExpirationAlertImplTest {
         batch.setProduct(product);
         return batch;
     }
+
+    @Test
+    void shouldReturnBatchesExpiringIn7DaysForAuthenticatedUser() {
+        Integer userId = 1;
+        LocalDate today = LocalDate.now();
+
+        Batch batch1 = createBatch(
+                1, "LT-001", 10,
+                today.plusDays(3),
+                1000.0, 10, 100,
+                "Arroz", userId
+        );
+
+        Batch batch2 = createBatch(
+                2, "LT-002", 5,
+                today.plusDays(7),
+                1000.0, 10, 100,
+                "Arroz", userId
+        );
+
+        Batch expired = createBatch(
+                3, "LT-003", 5,
+                today.minusDays(1),
+                1000.0, 10, 100,
+                "Arroz", userId
+        );
+
+        Batch farFuture = createBatch(
+                4, "LT-004", 5,
+                today.plusDays(15),
+                1000.0, 10, 100,
+                "Arroz", userId
+        );
+
+        Batch otherUser = createBatch(
+                5, "LT-005", 5,
+                today.plusDays(3),
+                1000.0, 10, 100,
+                "Arroz", 99
+        );
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(batchRepository.findAll())
+                .thenReturn(List.of(batch1, batch2, expired, farFuture, otherUser));
+
+        List<ExpirationAlertDTO> alerts =
+                service.findBatchesExpiringIn7Days();
+
+        assertEquals(2, alerts.size());
+
+        assertEquals(1, alerts.get(0).getBatchId());
+        assertEquals(2, alerts.get(1).getBatchId());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoBatchExpiresIn7Days() {
+        Integer userId = 1;
+        LocalDate today = LocalDate.now();
+
+        Batch batch = createBatch(
+                1, "LT-001", 10,
+                today.plusDays(20),
+                1000.0, 10, 100,
+                "Arroz", userId
+        );
+
+        when(verificationService.getUserId()).thenReturn(userId);
+        when(batchRepository.findAll()).thenReturn(List.of(batch));
+
+        List<ExpirationAlertDTO> alerts =
+                service.findBatchesExpiringIn7Days();
+
+        assertEquals(0, alerts.size());
+    }
 }
