@@ -76,7 +76,7 @@ O **noWaste** atua nesse cenário oferecendo:
 
 | Integrante | Responsabilidade |
 |---|---|
-| Gabriel Felipe | Product Owner / Frontend |
+| Gabriel Felipe | Product Owner |
 | Isadora Rodrigues | Frontend |
 | Wesley Carvalho | Scrum Master |
 | Henrique Cezar | Backend |
