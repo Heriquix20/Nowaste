@@ -32,7 +32,7 @@ public class Batch {
     private Integer quantity;
 
     @NotNull(message = "A data de validade e obrigatoria")
-//    @FutureOrPresent(message = "A data de validade nao pode ser no passado")
+    @FutureOrPresent(message = "A data de validade nao pode ser no passado")
     @Column(nullable = false)
     private LocalDate expirationDate;
 

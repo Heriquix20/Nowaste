@@ -25,7 +25,7 @@ public class BatchDTO {
     private Integer quantity;
 
     @NotNull(message = "A data de validade é obrigatoria")
-//    @FutureOrPresent(message = "A data de validade não pode ser no passado")
+    @FutureOrPresent(message = "A data de validade não pode ser no passado")
     private LocalDate expirationDate;
 
     private Double totalWeight;
