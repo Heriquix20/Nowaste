@@ -27,3 +27,6 @@ replay_pid*
 # .idea configs
 .idea/*
 !.idea/compiler.xml
+
+# node modules
+/node_modules/
