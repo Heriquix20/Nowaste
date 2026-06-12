@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 import "./templatemo-622-clearwave.css";
 import IconEdit from "../assets/images/icons/edit.svg";
 import IconDelete from "../assets/images/icons/delete.svg";
@@ -23,8 +24,6 @@ export default function InventoryList() {
 
         if (storedUser) {
             const parsedUser = JSON.parse(storedUser);
-            // AJUSTE AQUI: Se o seu token estiver salvo direto no localStorage como 'token',
-            // mude para: token = localStorage.getItem("token");
             token = parsedUser.token || parsedUser.accessToken || "";
         }
 
@@ -49,7 +48,6 @@ export default function InventoryList() {
 
     async function carregarInventarios() {
         try {
-            // Adicionado o cabeçalho de autenticação no GET
             const response = await fetch("http://localhost:8080/inventories", {
                 headers: getAuthHeaders()
             });
@@ -84,11 +82,20 @@ export default function InventoryList() {
     }
 
     async function deletarInventario(id) {
-        const confirmacao = window.confirm("Tem certeza que deseja excluir este inventário?");
-        if (!confirmacao) return;
+        const resultado = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Todos os produtos deste estoque e seus lotes serão excluídos!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sim, excluir tudo!",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!resultado.isConfirmed) return;
 
         try {
-            // Adicionado o cabeçalho de autenticação no DELETE
             const response = await fetch(`http://localhost:8080/inventories/${id}`, {
                 method: "DELETE",
                 headers: getAuthHeaders()
@@ -98,9 +105,23 @@ export default function InventoryList() {
 
             setInventories(prev => prev.filter(inv => inv.id !== id));
             if (editingId === id) cancelarEdicao();
+
+            Swal.fire({
+                title: "Deletado!",
+                text: "O estoque foi removido com sucesso.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
+
         } catch (error) {
             console.error(error);
-            alert("Erro ao excluir inventário.");
+            Swal.fire({
+                title: "Erro!",
+                text: "Não foi possível excluir o inventário.",
+                icon: "error",
+                confirmButtonColor: "#3085d6"
+            });
         }
     }
 
@@ -112,7 +133,6 @@ export default function InventoryList() {
                 : "http://localhost:8080/inventories";
             const method = editingId ? "PUT" : "POST";
 
-            // Adicionado o cabeçalho de autenticação mesclado com Content-Type no PUT/POST
             const response = await fetch(url, {
                 method: method,
                 headers: getAuthHeaders({ "Content-Type": "application/json" }),
@@ -131,10 +151,23 @@ export default function InventoryList() {
             }
 
             setInventoryForm({ name: "", description: "", location: "" });
-            alert("Inventário salvo com sucesso!");
+
+            Swal.fire({
+                title: "Salvo com sucesso!",
+                text: editingId ? "As alterações foram gravadas." : "Novo estoque disponível.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
         } catch (error) {
             console.error(error);
-            alert("Erro ao salvar inventário");
+            Swal.fire({
+                title: "Erro ao salvar",
+                text: "Verifique a conexão ou os dados enviados.",
+                icon: "error",
+                confirmButtonColor: "var(--accent, #3085d6)"
+            });
         }
     }
 
@@ -234,7 +267,7 @@ export default function InventoryList() {
                                             border: "1px solid var(--border)",
                                             display: "flex",
                                             flexDirection: "column",
-                                            justifyContent: "space-between",
+                                            justify: "space-between",
                                             transition: "transform 0.2s, box-shadow 0.2s"
                                         }}
                                         onMouseEnter={(e) => {

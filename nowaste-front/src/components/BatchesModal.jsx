@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { api } from "../pages/services/api.js";
+import Swal from 'sweetalert2';
 
 export default function BatchesModal({ inventoryId, productId, productName, onClose }) {
     const [batches, setBatches] = useState([]);
+    const [editingId, setEditingId] = useState(null); // NOVO: Controla qual lote está sendo editado
     const [batchForm, setBatchForm] = useState({
         batchCode: "",
         quantity: "",
         expirationDate: ""
     });
-
 
     useEffect(() => {
         if (productId && inventoryId) carregarLotes();
@@ -23,30 +24,107 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
         }
     }
 
+    // NOVO: Prepara os dados do lote selecionado de volta para o formulário superior
+    function prepararEdicao(batch) {
+        setBatchForm({
+            batchCode: batch.batchCode || "",
+            quantity: batch.quantity,
+            // Corta a string da data para o formato yyyy-MM-dd exigido pelo input type="date"
+            expirationDate: batch.expirationDate ? batch.expirationDate.split("T")[0] : ""
+        });
+        setEditingId(batch.id);
+    }
+
+    // NOVO: Cancela o estado de edição do formulário
+    function cancelarEdicao() {
+        setBatchForm({ batchCode: "", quantity: "", expirationDate: "" });
+        setEditingId(null);
+    }
+
+    // ATUALIZADO: Salva (POST) ou atualiza (PUT) o lote dependendo do estado "editingId"
     async function salvarLote(e) {
         e.preventDefault();
         try {
-            const novoLote = {
+            const dadosLote = {
                 batchCode: batchForm.batchCode,
                 quantity: Number(batchForm.quantity),
                 expirationDate: batchForm.expirationDate
             };
 
-            const response = await api.post(`/inventories/${inventoryId}/products/${productId}/batches`, novoLote);
+            if (editingId) {
+                // Modo Edição (PUT) para o endpoint do Spring
+                const response = await api.put(`/inventories/${inventoryId}/products/${productId}/batches/${editingId}`, dadosLote);
+                setBatches(prev => prev.map(batch => batch.id === editingId ? response.data : batch));
+                setEditingId(null);
+            } else {
+                // Modo Criação (POST)
+                const response = await api.post(`/inventories/${inventoryId}/products/${productId}/batches`, dadosLote);
+                setBatches(prev => [...prev, response.data]);
+            }
 
-            setBatches(prev => [...prev, response.data]);
             setBatchForm({ batchCode: "", quantity: "", expirationDate: "" });
-            alert("Lote adicionado com sucesso!");
+
+            Swal.fire({
+                title: "Sucesso!",
+                text: editingId ? "Lote atualizado com sucesso." : "Lote adicionado corretamente.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
         } catch (error) {
             console.error("Erro ao salvar lote:", error);
-            alert("Erro ao salvar lote. Verifique as regras no backend.");
+            Swal.fire({
+                title: "Erro!",
+                text: "Não foi possível salvar o lote. Verifique as regras.",
+                icon: "error",
+                confirmButtonColor: "var(--accent, #3085d6)"
+            });
         }
     }
 
-    // Função auxiliar para estilizar as badges de status que vêm do Java
+    async function deletarLote(batchId) {
+        const resultado = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Esta ação não poderá ser desfeita!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sim, excluir!",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!resultado.isConfirmed) return;
+
+        try {
+            await api.delete(`/inventories/${inventoryId}/products/${productId}/batches/${batchId}`);
+            setBatches(prev => prev.filter(batch => batch.id !== batchId));
+
+            if (editingId === batchId) cancelarEdicao();
+
+            Swal.fire({
+                title: "Excluído!",
+                text: "O lote foi removido do sistema.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+        } catch (error) {
+            console.error("Erro ao deletar lote:", error);
+            Swal.fire({
+                title: "Erro!",
+                text: "Ocorreu um problema ao tentar excluir o lote.",
+                icon: "error",
+                confirmButtonColor: "#3085d6"
+            });
+        }
+    }
+
     function renderStatusBadge(status) {
         const styles = {
-            EXPIRED: { bg: "#rgba(217, 83, 79, 0.1)", text: "#d9534f", label: "Vencido" },
+            EXPIRED: { bg: "rgba(217, 83, 79, 0.1)", text: "#d9534f", label: "Vencido" },
             WARNING: { bg: "rgba(240, 173, 78, 0.1)", text: "#f0ad4e", label: "Atenção Crítica" },
             MONTH_WARNING: { bg: "rgba(91, 192, 222, 0.1)", text: "#5bc0de", label: "Vence em 30 dias" },
             OK: { bg: "var(--accent-ghost)", text: "var(--accent)", label: "OK" }
@@ -78,13 +156,22 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
                     <button onClick={onClose} style={{ background: "transparent", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "var(--text-3)" }}>✕</button>
                 </div>
 
-                {/* FORMULÁRIO DE CADASTRO */}
+                {/* FORMULÁRIO DE CADASTRO / EDIÇÃO */}
                 <form onSubmit={salvarLote} style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" }}>
-                    <input style={{ flex: "1 1 140px" }} className="input" placeholder="Cód. Lote (ex: L123)" value={batchForm.batchCode} onChange={e => setBatchForm({...batchForm, batchCode: e.target.value})} />
+                    {/*<input style={{ flex: "1 1 140px" }} className="input" placeholder="Cód. Lote (ex: L123)" value={batchForm.batchCode} onChange={e => setBatchForm({...batchForm, batchCode: e.target.value})} />*/}
                     <input style={{ flex: "1 1 100px" }} className="input" type="number" required min="1" placeholder="Qtd" value={batchForm.quantity} onChange={e => setBatchForm({...batchForm, quantity: e.target.value})} />
-                    <input style={{ flex: "1 1 160px" }} className="input" type="date" value={batchForm.expirationDate} onChange={e => setBatchForm({...batchForm, expirationDate: e.target.value})} />
+                    <input style={{ flex: "1 1 160px" }} className="input" type="date" required value={batchForm.expirationDate} onChange={e => setBatchForm({...batchForm, expirationDate: e.target.value})} />
 
-                    <button className="btn-primary" type="submit" style={{ width: "100%", marginTop: "4px" }}>Adicionar Lote</button>
+                    <div style={{ width: "100%", display: "flex", gap: "8px", marginTop: "4px" }}>
+                        <button className="btn-primary" type="submit" style={{ flex: 2 }}>
+                            {editingId ? "Salvar Alterações" : "Adicionar Lote"}
+                        </button>
+                        {editingId && (
+                            <button type="button" onClick={cancelarEdicao} style={{ flex: 1, background: "rgba(0,0,0,0.05)", color: "var(--text-2)", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>
+                                Cancelar
+                            </button>
+                        )}
+                    </div>
                 </form>
 
                 {/* LISTAGEM DOS LOTES */}
@@ -104,8 +191,47 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
                                         {batch.daysToExpire < 0 ? "Vencido há " : "Faltam "} {Math.abs(batch.daysToExpire)} dias
                                     </small>
                                 </div>
-                                <div>
+
+                                {/* BOTÕES DE AÇÃO: STATUS + EDITAR + EXCLUIR */}
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                                     {renderStatusBadge(batch.status)}
+
+                                    <button
+                                        onClick={() => prepararEdicao(batch)}
+                                        title="Editar Lote"
+                                        style={{
+                                            background: "rgba(84, 124, 162, 0.1)",
+                                            color: "var(--accent, #347ca2)",
+                                            border: "none",
+                                            borderRadius: "8px",
+                                            padding: "6px 10px",
+                                            cursor: "pointer",
+                                            fontWeight: "bold",
+                                            fontSize: "0.9rem"
+                                        }}
+                                    >
+                                        ✏️
+                                    </button>
+
+                                    <button
+                                        onClick={() => deletarLote(batch.id)}
+                                        title="Excluir Lote"
+                                        style={{
+                                            background: "rgba(217, 83, 79, 0.1)",
+                                            color: "#d9534f",
+                                            border: "none",
+                                            borderRadius: "8px",
+                                            padding: "6px 10px",
+                                            cursor: "pointer",
+                                            fontWeight: "bold",
+                                            fontSize: "0.9rem",
+                                            transition: "background 0.2s"
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.background = "rgba(217, 83, 79, 0.2)"}
+                                        onMouseLeave={(e) => e.target.style.background = "rgba(217, 83, 79, 0.1)"}
+                                    >
+                                        🗑️
+                                    </button>
                                 </div>
                             </div>
                         ))

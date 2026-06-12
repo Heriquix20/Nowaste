@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "./services/api.js";
 import BatchesModal from "../components/BatchesModal.jsx";
+import Swal from 'sweetalert2';
 import "./templatemo-622-clearwave.css";
 
 export default function InventoryProducts() {
@@ -10,6 +11,8 @@ export default function InventoryProducts() {
 
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [editingId, setEditingId] = useState(null); // NOVO: Controla qual produto está sendo editado
+
     const [productForm, setProductForm] = useState({
         name: "",
         weight: "",
@@ -18,7 +21,7 @@ export default function InventoryProducts() {
     });
 
     useEffect(() => {
-        carregarProdutos();
+        if (inventoryId) carregarProdutos();
     }, [inventoryId]);
 
     async function carregarProdutos() {
@@ -27,14 +30,38 @@ export default function InventoryProducts() {
             setProducts(response.data);
         } catch (error) {
             console.error("Erro ao buscar produtos do banco:", error);
-            alert("Não foi possível carregar os produtos deste inventário.");
+            Swal.fire({
+                title: "Erro!",
+                text: "Não foi possível carregar os produtos deste inventário.",
+                icon: "error",
+                confirmButtonColor: "var(--accent, #3085d6)"
+            });
         }
     }
 
-    async function criarProduto(e) {
+    // NOVO: Carrega os dados do card de volta para o formulário lateral
+    function prepararEdicao(product) {
+        setProductForm({
+            name: product.name,
+            weight: product.weight,
+            category: product.category,
+            brand: product.brand || ""
+        });
+        setEditingId(product.id);
+        window.scrollTo({ top: 0, behavior: "smooth" }); // Sobe a página suavemente até o formulário
+    }
+
+    // NOVO: Cancela o modo de edição limpando os campos
+    function cancelarEdicao() {
+        setProductForm({ name: "", weight: "", category: "", brand: "" });
+        setEditingId(null);
+    }
+
+    // ATUALIZADO: Salva (POST) ou Atualiza (PUT) dependendo do estado "editingId"
+    async function salvarProduto(e) {
         e.preventDefault();
         try {
-            const novoProdutoDTO = {
+            const produtoDTO = {
                 name: productForm.name,
                 weight: Number(productForm.weight),
                 category: productForm.category,
@@ -42,14 +69,76 @@ export default function InventoryProducts() {
                 weightUnit: "g"
             };
 
-            const response = await api.post(`/inventories/${inventoryId}/products`, novoProdutoDTO);
-            setProducts(prev => [...prev, response.data]);
+            if (editingId) {
+                // Modo Edição (PUT)
+                const response = await api.put(`/inventories/${inventoryId}/products/${editingId}`, produtoDTO);
+                setProducts(prev => prev.map(prod => prod.id === editingId ? response.data : prod));
+                setEditingId(null);
+            } else {
+                // Modo Criação (POST)
+                const response = await api.post(`/inventories/${inventoryId}/products`, produtoDTO);
+                setProducts(prev => [...prev, response.data]);
+            }
 
             setProductForm({ name: "", weight: "", category: "", brand: "" });
-            alert("Produto salvo com sucesso!");
+
+            Swal.fire({
+                title: "Sucesso!",
+                text: editingId ? "Produto atualizado com sucesso." : "O item foi adicionado ao catálogo.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
         } catch (error) {
-            console.error("Erro ao salvar produto no banco:", error);
-            alert("Erro ao salvar produto.");
+            console.error("Erro ao salvar produto:", error);
+            Swal.fire({
+                title: "Falha ao salvar",
+                text: "Verifique os dados inseridos ou as regras no backend.",
+                icon: "error",
+                confirmButtonColor: "#3085d6"
+            });
+        }
+    }
+
+    // NOVO: Deleta o produto do banco via DELETE
+    async function deletarProduto(productId) {
+        const resultado = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Remover este produto irá apagar todos os seus lotes de validade!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sim, excluir!",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!resultado.isConfirmed) return;
+
+        try {
+            await api.delete(`/inventories/${inventoryId}/products/${productId}`);
+
+            // Filtra o estado para remover da tela instantaneamente
+            setProducts(prev => prev.filter(prod => prod.id !== productId));
+
+            if (editingId === productId) cancelarEdicao();
+
+            Swal.fire({
+                title: "Excluído!",
+                text: "O produto foi removido do estoque.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error("Erro ao deletar produto:", error);
+            Swal.fire({
+                title: "Erro!",
+                text: "Não foi possível excluir o produto. Verifique dependências.",
+                icon: "error",
+                confirmButtonColor: "#3085d6"
+            });
         }
     }
 
@@ -72,12 +161,14 @@ export default function InventoryProducts() {
 
                     {/* COLUNA ESQUERDA: FORMULÁRIO LATERAL FIXO */}
                     <div style={{ background: "var(--surface)", padding: "28px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)", position: "sticky", top: "20px" }}>
-                        <h2 style={{ marginTop: 0, marginBottom: "8px", fontSize: "1.4rem", fontWeight: "700" }}>Novo Produto</h2>
+                        <h2 style={{ marginTop: 0, marginBottom: "8px", fontSize: "1.4rem", fontWeight: "700" }}>
+                            {editingId ? "Editar Produto" : "Novo Produto"}
+                        </h2>
                         <p style={{ color: "var(--text-3)", fontSize: "0.85rem", margin: "0 0 24px 0" }}>
-                            Cadastre a especificação geral do item antes de adicionar as quantidades e validades por lote.
+                            {editingId ? "Modifique as especificações gerais do item selecionado." : "Cadastre a especificação geral do item antes de adicionar as quantidades e validades por lote."}
                         </p>
 
-                        <form onSubmit={criarProduto} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                        <form onSubmit={salvarProduto} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                             <div>
                                 <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "6px", color: "var(--text-2)" }}>Nome do Produto *</label>
                                 <input className="input" required placeholder="Ex: Arroz Integral, Leite Desnatado..." value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} style={{ width: "100%" }} />
@@ -98,9 +189,16 @@ export default function InventoryProducts() {
                                 <input className="input" placeholder="Ex: Tio João, Nestlé..." value={productForm.brand} onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })} style={{ width: "100%" }} />
                             </div>
 
-                            <button className="btn-primary" type="submit" style={{ padding: "12px", borderRadius: "10px", fontWeight: "600", marginTop: "8px" }}>
-                                Salvar Produto
-                            </button>
+                            <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+                                <button className="btn-primary" type="submit" style={{ flex: 2, padding: "12px", borderRadius: "10px", fontWeight: "600" }}>
+                                    {editingId ? "Atualizar" : "Salvar Produto"}
+                                </button>
+                                {editingId && (
+                                    <button type="button" onClick={cancelarEdicao} style={{ flex: 1, padding: "12px", borderRadius: "10px", background: "rgba(0,0,0,0.05)", color: "var(--text-2)", border: "none", cursor: "pointer", fontWeight: "600" }}>
+                                        Cancelar
+                                    </button>
+                                )}
+                            </div>
                         </form>
                     </div>
 
@@ -165,13 +263,32 @@ export default function InventoryProducts() {
                                             </div>
                                         </div>
 
-                                        <button
-                                            className="btn-primary"
-                                            onClick={() => setSelectedProduct(product)}
-                                            style={{ width: "100%", padding: "12px", borderRadius: "8px", fontWeight: "600", fontSize: "0.9rem", marginTop: "24px" }}
-                                        >
-                                            Ver Lotes / Validade
-                                        </button>
+                                        {/* SEÇÃO REESTRUTURADA DE BOTÕES DO CARD */}
+                                        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "24px" }}>
+                                            <button
+                                                className="btn-primary"
+                                                onClick={() => setSelectedProduct(product)}
+                                                style={{ width: "100%", padding: "10px", borderRadius: "8px", fontWeight: "600", fontSize: "0.9rem" }}
+                                            >
+                                                Ver Lotes / Validade
+                                            </button>
+
+                                            <div style={{ display: "flex", gap: "8px" }}>
+                                                <button
+                                                    onClick={() => prepararEdicao(product)}
+                                                    style={{ flex: 1, padding: "8px", borderRadius: "6px", background: "rgba(84, 124, 162, 0.1)", border: "none", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", fontSize: "0.85rem", fontWeight: "600", color: "var(--accent)" }}
+                                                >
+                                                    Editar
+                                                </button>
+                                                <button
+                                                    onClick={() => deletarProduto(product.id)}
+                                                    style={{ flex: 1, padding: "8px", borderRadius: "6px", background: "rgba(217, 83, 79, 0.1)", border: "none", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", fontSize: "0.85rem", fontWeight: "600", color: "#d9534f" }}
+                                                >
+                                                    Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 ))}
                             </div>
