@@ -330,7 +330,7 @@ export default function InventoryList() {
 
                                             <div style={{ textAlign: "center", marginTop: "4px" }}>
                                                 <span style={{ color: "var(--text-3)", fontSize: "0.75rem" }}>
-                                                    Criado em: {inventory.createdAt && new Date(inventory.createdAt).toLocaleDateString("pt-BR")}
+                                                    Criado em: {inventory.createdAt || "Não informado"}
                                                 </span>
                                             </div>
                                         </div>
