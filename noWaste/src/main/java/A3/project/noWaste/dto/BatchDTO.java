@@ -21,7 +21,7 @@ public class BatchDTO {
 
     private String code;
 
-    @Size(max = 25, message = "O código do lote do fornecedor deve ter no máximo 25 caracteres")
+    @Size(max = 20, message = "O código do lote do fornecedor deve ter no máximo 20 caracteres")
     private String supplierBatchCode;
 
     @NotNull(message = "A quantidade não pode ser nula")

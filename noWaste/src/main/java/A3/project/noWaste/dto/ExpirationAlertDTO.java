@@ -24,6 +24,7 @@ public class ExpirationAlertDTO {
     // lote
     private Integer batchId;
     private String batchCode;
+    private String supplierBatchCode;
 
     // atributos importantes do lote
     private Integer quantity;

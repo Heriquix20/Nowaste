@@ -31,7 +31,8 @@ export default function Inventory() {
 
             const resExpired = await api.get("/alerts/expired");
             const resMonth = await api.get("/alerts/month");
-
+            console.log("Expired:", resExpired.data);
+            console.log("Month:", resMonth.data);
             setExpiredBatches(resExpired.data || []);
             setWarningBatches(resMonth.data || []);
 
@@ -100,9 +101,8 @@ export default function Inventory() {
                     </button>
                 </div>
 
-                {/* DASHBOARD GRID: MÉTRICAS RÁPIDAS COM ICONES PNG */}
+                {/* DASHBOARD GRID */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px", marginBottom: "40px" }}>
-
                     {/* CARD 1: ITENS CRÍTICOS */}
                     <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
                         <div style={{ background: "rgba(217, 83, 79, 0.08)", padding: "12px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -153,19 +153,19 @@ export default function Inventory() {
                                     <thead>
                                     <tr style={{ borderBottom: "2px solid var(--border)", color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600" }}>
                                         <th style={{ padding: "12px 16px" }}>Produto / Descrição</th>
-                                        <th style={{ padding: "12px 16px" }}>Cód. Lote</th>
+                                        <th style={{ padding: "12px 16px" }}>Nº Lote Fornecedor</th>
                                         <th style={{ padding: "12px 16px" }}>Qtd</th>
                                         <th style={{ padding: "12px 16px" }}>Data de Validade</th>
                                         <th style={{ padding: "12px 16px" }}>Status</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {expiredBatches.map(batch => (
-                                        <tr key={batch.batchId} style={{ borderBottom: "1px solid var(--border)", fontSize: "0.95rem" }}>
+                                    {expiredBatches.map((batch, index) => (
+                                        <tr key={`expired-${batch.batchId || index}`} style={{ borderBottom: "1px solid var(--border)", fontSize: "0.95rem" }}>
                                             <td style={{ padding: "16px", fontWeight: "600" }}>{batch.productName}</td>
                                             <td style={{ padding: "16px" }}>
                                                 <code style={{ background: "var(--bg)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.85rem", border: "1px solid var(--border)" }}>
-                                                    {batch.batchCode || `Lote #${batch.batchId}`}
+                                                    {batch.supplierBatchCode || batch.code || batch.batchCode || `Lote #${batch.batchId}`}
                                                 </code>
                                             </td>
                                             <td style={{ padding: "16px", fontWeight: "500" }}>{batch.quantity}</td>
@@ -200,21 +200,21 @@ export default function Inventory() {
                                     <thead>
                                     <tr style={{ borderBottom: "2px solid var(--border)", color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600" }}>
                                         <th style={{ padding: "12px 16px" }}>Produto</th>
-                                        <th style={{ padding: "12px 16px" }}>Cód. Lote</th>
+                                        <th style={{ padding: "12px 16px" }}>Nº Lote Fornecedor</th>
                                         <th style={{ padding: "12px 16px" }}>Qtd</th>
                                         <th style={{ padding: "12px 16px" }}>Data de Validade</th>
                                         <th style={{ padding: "12px 16px" }}>Tempo Restante</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {warningBatches.map(batch => {
+                                    {warningBatches.map((batch, index) => {
                                         const critical = batch.daysToExpire <= 7;
                                         return (
-                                            <tr key={batch.batchId} style={{ borderBottom: "1px solid var(--border)", fontSize: "0.95rem" }}>
+                                            <tr key={`warning-${batch.batchId || index}`} style={{ borderBottom: "1px solid var(--border)", fontSize: "0.95rem" }}>
                                                 <td style={{ padding: "16px", fontWeight: "600" }}>{batch.productName}</td>
                                                 <td style={{ padding: "16px" }}>
                                                     <code style={{ background: "var(--bg)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.85rem", border: "1px solid var(--border)" }}>
-                                                        {batch.batchCode || `Lote #${batch.batchId}`}
+                                                        {batch.supplierBatchCode || batch.code || batch.batchCode || `Lote #${batch.batchId}`}
                                                     </code>
                                                 </td>
                                                 <td style={{ padding: "16px", fontWeight: "500" }}>{batch.quantity}</td>

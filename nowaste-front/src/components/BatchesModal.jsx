@@ -4,9 +4,12 @@ import Swal from 'sweetalert2';
 
 export default function BatchesModal({ inventoryId, productId, productName, onClose }) {
     const [batches, setBatches] = useState([]);
-    const [editingId, setEditingId] = useState(null); // NOVO: Controla qual lote está sendo editado
+    const [editingId, setEditingId] = useState(null);
+
+    const hoje = new Date().toISOString().split("T")[0];
+
     const [batchForm, setBatchForm] = useState({
-        batchCode: "",
+        supplierBatchCode: "",
         quantity: "",
         expirationDate: ""
     });
@@ -24,45 +27,41 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
         }
     }
 
-    // NOVO: Prepara os dados do lote selecionado de volta para o formulário superior
     function prepararEdicao(batch) {
         setBatchForm({
-            batchCode: batch.batchCode || "",
+            supplierBatchCode: batch.supplierBatchCode || batch.code || batch.batchCode || "",
             quantity: batch.quantity,
-            // Corta a string da data para o formato yyyy-MM-dd exigido pelo input type="date"
             expirationDate: batch.expirationDate ? batch.expirationDate.split("T")[0] : ""
         });
         setEditingId(batch.id);
     }
 
-    // NOVO: Cancela o estado de edição do formulário
     function cancelarEdicao() {
-        setBatchForm({ batchCode: "", quantity: "", expirationDate: "" });
+        setBatchForm({ supplierBatchCode: "", quantity: "", expirationDate: "" });
         setEditingId(null);
     }
 
-    // ATUALIZADO: Salva (POST) ou atualiza (PUT) o lote dependendo do estado "editingId"
     async function salvarLote(e) {
         e.preventDefault();
         try {
             const dadosLote = {
-                batchCode: batchForm.batchCode,
+                code: batchForm.supplierBatchCode,
+                batchCode: batchForm.supplierBatchCode,
+                supplierBatchCode: batchForm.supplierBatchCode,
                 quantity: Number(batchForm.quantity),
                 expirationDate: batchForm.expirationDate
             };
 
             if (editingId) {
-                // Modo Edição (PUT) para o endpoint do Spring
                 const response = await api.put(`/inventories/${inventoryId}/products/${productId}/batches/${editingId}`, dadosLote);
                 setBatches(prev => prev.map(batch => batch.id === editingId ? response.data : batch));
                 setEditingId(null);
             } else {
-                // Modo Criação (POST)
                 const response = await api.post(`/inventories/${inventoryId}/products/${productId}/batches`, dadosLote);
                 setBatches(prev => [...prev, response.data]);
             }
 
-            setBatchForm({ batchCode: "", quantity: "", expirationDate: "" });
+            setBatchForm({ supplierBatchCode: "", quantity: "", expirationDate: "" });
 
             Swal.fire({
                 title: "Sucesso!",
@@ -115,7 +114,7 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
             console.error("Erro ao deletar lote:", error);
             Swal.fire({
                 title: "Erro!",
-                text: "Ocorreu um problema ao tentar excluir o lote.",
+                text: "Ocorreu um problem ao tentar excluir o lote.",
                 icon: "error",
                 confirmButtonColor: "#3085d6"
             });
@@ -158,9 +157,27 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
 
                 {/* FORMULÁRIO DE CADASTRO / EDIÇÃO */}
                 <form onSubmit={salvarLote} style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" }}>
-                    {/*<input style={{ flex: "1 1 140px" }} className="input" placeholder="Cód. Lote (ex: L123)" value={batchForm.batchCode} onChange={e => setBatchForm({...batchForm, batchCode: e.target.value})} />*/}
-                    <input style={{ flex: "1 1 100px" }} className="input" type="number" required min="1" placeholder="Qtd" value={batchForm.quantity} onChange={e => setBatchForm({...batchForm, quantity: e.target.value})} />
-                    <input style={{ flex: "1 1 160px" }} className="input" type="date" required value={batchForm.expirationDate} onChange={e => setBatchForm({...batchForm, expirationDate: e.target.value})} />
+
+                    <input
+                        style={{ flex: "2 1 200px" }}
+                        className="input"
+                        required
+                        placeholder="Número do Lote (Fornecedor)"
+                        value={batchForm.supplierBatchCode}
+                        onChange={e => setBatchForm({...batchForm, supplierBatchCode: e.target.value})}
+                    />
+
+                    <input style={{ flex: "1 1 80px" }} className="input" type="number" required min="1" placeholder="Qtd" value={batchForm.quantity} onChange={e => setBatchForm({...batchForm, quantity: e.target.value})} />
+
+                    <input
+                        style={{ flex: "1 1 160px" }}
+                        className="input"
+                        type="date"
+                        required
+                        min={hoje}
+                        value={batchForm.expirationDate}
+                        onChange={e => setBatchForm({...batchForm, expirationDate: e.target.value})}
+                    />
 
                     <div style={{ width: "100%", display: "flex", gap: "8px", marginTop: "4px" }}>
                         <button className="btn-primary" type="submit" style={{ flex: 2 }}>
@@ -183,7 +200,10 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
                         batches.map(batch => (
                             <div key={batch.id} style={{ background: "var(--bg)", padding: "16px", borderRadius: "12px", border: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <div>
-                                    <strong style={{ color: "var(--text-1)" }}>{batch.batchCode || `Lote #${batch.id}`}</strong>
+                                    <strong style={{ color: "var(--text-1)" }}>
+                                        {batch.supplierBatchCode || batch.code || batch.batchCode || `Lote #${batch.id}`}
+                                    </strong>
+
                                     <div style={{ fontSize: "0.9rem", color: "var(--text-2)", marginTop: "4px" }}>
                                         Quantidade: {batch.quantity} | Validade: {new Date(batch.expirationDate).toLocaleDateString("pt-BR")}
                                     </div>

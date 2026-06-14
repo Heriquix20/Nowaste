@@ -42,6 +42,11 @@ Free for personal and commercial use
     ul { list-style: none; }
     img { display: block; max-width: 100%; }
     button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    .nav-links a,
+    .nav-logo,
+    .nav-cta a {
+        text-decoration: none;
+    }
 
     /* ── SUBTLE NOISE TEXTURE ── */
     body::before {

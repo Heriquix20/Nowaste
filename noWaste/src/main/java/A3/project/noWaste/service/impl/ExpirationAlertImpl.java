@@ -95,6 +95,7 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
 
         dto.setBatchId(batch.getId());
         dto.setBatchCode(batch.getCode());
+        dto.setSupplierBatchCode(batch.getSupplierBatchCode());
 
         dto.setQuantity(batch.getQuantity());
         dto.setTotalWeight(batch.getTotalWeight());
