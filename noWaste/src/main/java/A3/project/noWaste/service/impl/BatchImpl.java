@@ -101,6 +101,7 @@ public class BatchImpl implements BatchService {
         Batch batch = new Batch();
         batch.setId(null);
         batch.setCode(generateBatchCode(product));
+        batch.setSupplierBatchCode(obj.getSupplierBatchCode());
         batch.setQuantity(obj.getQuantity());
         batch.setExpirationDate(obj.getExpirationDate());
         batch.setProduct(product);
@@ -114,6 +115,7 @@ public class BatchImpl implements BatchService {
         Batch batch = findById(inventoryId, productId, batchId);
 
         batch.setQuantity(obj.getQuantity());
+        batch.setSupplierBatchCode(obj.getSupplierBatchCode());
         batch.setExpirationDate(obj.getExpirationDate());
 
         return repository.save(batch);

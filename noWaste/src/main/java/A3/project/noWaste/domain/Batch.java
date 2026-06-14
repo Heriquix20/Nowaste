@@ -26,6 +26,9 @@ public class Batch {
     @Column(nullable = false)
     private String code;
 
+    @Column(name = "supplier_batch_code", length = 100)
+    private String supplierBatchCode;
+
     @NotNull(message = "A quantidade e obrigatoria")
     @Min(value = 1, message = "A quantidade deve ser maior que zero")
     @Column(nullable = false)
