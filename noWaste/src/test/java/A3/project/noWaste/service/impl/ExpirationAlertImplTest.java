@@ -35,8 +35,8 @@ class ExpirationAlertImplTest {
     void shouldReturnCurrentMonthBatchesForAuthenticatedUserSortedAndMapped() {
         Integer userId = 1;
         LocalDate today = LocalDate.now();
-        LocalDate firstDate = today.withDayOfMonth(1);
-        LocalDate secondDate = today.withDayOfMonth(Math.min(2, today.lengthOfMonth()));
+        LocalDate firstDate = today.plusDays(1);
+        LocalDate secondDate = today.plusDays(2);
 
         Batch laterBatch = createBatch(2, "LT-ARROZ-002", 12, secondDate, 1000.0, 10, 100, "Arroz", userId);
         Batch earlierBatch = createBatch(1, "LT-ARROZ-001", 8, firstDate, 1000.0, 10, 100, "Arroz", userId);
