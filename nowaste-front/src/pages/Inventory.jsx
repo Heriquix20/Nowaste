@@ -116,13 +116,13 @@ export default function Inventory() {
                         </div>
                     </div>
 
-                    {/* CARD 2: VOLUME MONITORADO */}
+                    {/* CARD 2: VOLUME CRITICO MONITORADO */}
                     <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "20px", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
                         <div style={{ background: "rgba(84, 124, 162, 0.08)", padding: "12px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <img src={IconBox} alt="Estoque" width="28" height="28" />
                         </div>
                         <div>
-                            <div style={{ color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>Volume Monitorado</div>
+                            <div style={{ color: "var(--text-3)", fontSize: "0.85rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>Volume Crítico Monitorado</div>
                             <div style={{ color: "var(--accent)", fontSize: "1.8rem", fontWeight: "700", marginTop: "4px" }}>
                                 {metrics.totalWeight >= 1000
                                     ? `${(metrics.totalWeight / 1000).toFixed(2)} kg`

@@ -161,7 +161,6 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
                     <input
                         style={{ flex: "2 1 200px" }}
                         className="input"
-                        required
                         placeholder="Número do Lote (Fornecedor)"
                         value={batchForm.supplierBatchCode}
                         onChange={e => setBatchForm({...batchForm, supplierBatchCode: e.target.value})}
@@ -201,15 +200,20 @@ export default function BatchesModal({ inventoryId, productId, productName, onCl
                             <div key={batch.id} style={{ background: "var(--bg)", padding: "16px", borderRadius: "12px", border: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <div>
                                     <strong style={{ color: "var(--text-1)" }}>
-                                        {batch.supplierBatchCode || batch.code || batch.batchCode || `Lote #${batch.id}`}
+                                        {batch.code || batch.batchCode || `Lote #${batch.id}` || batch.supplierBatchCode}
                                     </strong>
 
                                     <div style={{ fontSize: "0.9rem", color: "var(--text-2)", marginTop: "4px" }}>
                                         Quantidade: {batch.quantity} | Validade: {new Date(batch.expirationDate).toLocaleDateString("pt-BR")}
                                     </div>
-                                    <small style={{ color: "var(--text-3)" }}>
-                                        {batch.daysToExpire < 0 ? "Vencido há " : "Faltam "} {Math.abs(batch.daysToExpire)} dias
-                                    </small>
+                                    <div style={{display: "flex", alignItems: "center", gap: "6px", marginTop: "4px"}}>
+                                        <small style={{ color: "var(--text-3)" }}>
+                                            {batch.daysToExpire < 0 ? "Vencido há " : "Faltam "} {Math.abs(batch.daysToExpire)} dias
+                                        </small>
+                                        <small style={{ color: "var(--text-3)" }}>
+                                          | Peso total do lote: {batch.totalWeight / 1000} kg
+                                        </small>
+                                    </div>
                                 </div>
 
                                 {/* BOTÕES DE AÇÃO: STATUS + EDITAR + EXCLUIR */}
