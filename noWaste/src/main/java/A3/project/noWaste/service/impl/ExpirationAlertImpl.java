@@ -34,6 +34,7 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
         return batchRepository.findAll().stream()
                 .filter(batch -> belongsToUser(batch, userId))
                 .filter(batch -> batch.getExpirationDate() != null)
+                .filter(batch -> !batch.getExpirationDate().isBefore(today))
                 .filter(batch -> batch.getExpirationDate().getMonthValue() == currentMonth
                         && batch.getExpirationDate().getYear() == currentYear)
                 .sorted(Comparator.comparing(Batch::getExpirationDate))
@@ -94,6 +95,7 @@ public class ExpirationAlertImpl implements ExpirationAlertService {
 
         dto.setBatchId(batch.getId());
         dto.setBatchCode(batch.getCode());
+        dto.setSupplierBatchCode(batch.getSupplierBatchCode());
 
         dto.setQuantity(batch.getQuantity());
         dto.setTotalWeight(batch.getTotalWeight());

@@ -9,7 +9,6 @@ import A3.project.noWaste.infra.BatchRepository;
 import A3.project.noWaste.infra.ProductRepository;
 import A3.project.noWaste.service.BatchService;
 import A3.project.noWaste.service.VerificationService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,13 +18,11 @@ import java.util.List;
 public class BatchImpl implements BatchService {
 
     private final BatchRepository repository;
-    private final ModelMapper mapper;
     private final ProductRepository productRepository;
     private final VerificationService verificationService;
 
-    public BatchImpl(BatchRepository repository, ModelMapper mapper, ProductRepository productRepository, VerificationService verificationService) {
+    public BatchImpl(BatchRepository repository, ProductRepository productRepository, VerificationService verificationService) {
         this.repository = repository;
-        this.mapper = mapper;
         this.productRepository = productRepository;
         this.verificationService = verificationService;
     }
@@ -104,6 +101,7 @@ public class BatchImpl implements BatchService {
         Batch batch = new Batch();
         batch.setId(null);
         batch.setCode(generateBatchCode(product));
+        batch.setSupplierBatchCode(obj.getSupplierBatchCode());
         batch.setQuantity(obj.getQuantity());
         batch.setExpirationDate(obj.getExpirationDate());
         batch.setProduct(product);
@@ -117,6 +115,7 @@ public class BatchImpl implements BatchService {
         Batch batch = findById(inventoryId, productId, batchId);
 
         batch.setQuantity(obj.getQuantity());
+        batch.setSupplierBatchCode(obj.getSupplierBatchCode());
         batch.setExpirationDate(obj.getExpirationDate());
 
         return repository.save(batch);

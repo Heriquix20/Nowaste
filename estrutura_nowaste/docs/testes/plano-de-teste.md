@@ -84,10 +84,9 @@
 | RF-06 | Cadastro e controle de lotes | 🔥 Alta | Issue Lote | UT-01, UT-02, UT-03, UT-04, RT-01 a RT-04 | 🟢 Executado |
 | RF-07 | Cálculo automático de validade | 🔥 Alta | Backend/Batch | UT-01, RT-01 | 🟢 Executado |
 | RF-08 | Alertas de vencimento | 🔥 Alta | Issue Alertas | UT-09, RT-09, RT-16 | 🟢 Executado parcialmente |
-| RF-09 | Filtros e ordenações | ⚠️ Média | Issues Produto/Lote/Inventário | UT-04, UT-06, UT-07, RT-04, RT-06 | 🟢 Executado |
-| RF-10 | Telas do frontend | 🔥 Alta | Issues Frontend | RT-12, RT-13, RT-15, RT-16, RT-18 | 🟢 Executado  |
-| RF-11 | Fluxo completo ponta a ponta | 🔥 Alta | Sprint 2 | RT-18, BDD-04 | 🟡 Planejado |
-| RF-12 | Documentação da Sprint 2 | ⚠️ Média | README/Roteiros | RT-DOC-01 | 🟢 Executado |
+| RF-09 | Telas do frontend | 🔥 Alta | Issues Frontend | RT-12, RT-13, RT-15, RT-16, RT-18 | 🟢 Executado  |
+| RF-10 | Fluxo completo ponta a ponta | 🔥 Alta | Sprint 2 | RT-18, BDD-04 | 🟡 Planejado |
+| RF-11 | Documentação da Sprint 2 | ⚠️ Média | README/Roteiros | RT-DOC-01 | 🟢 Executado |
 
 ---
 
@@ -98,9 +97,7 @@
 | UT-01 | ✅ Unitário | Status de validade do lote | Classe `Batch` disponível | Datas vencidas, próximas e nulas | Retornar `EXPIRED`, `WARNING`, `MONTH_WARNING`, `OK` ou `UNKNOWN` | 🔥 Alta | Sim |
 | UT-02 | ✅ Unitário | Dias restantes e peso total do lote | Produto relacionado ao lote | Peso 500g, quantidade 4, validade em 4 dias | Peso total 2000g e 4 dias restantes | 🔥 Alta | Sim |
 | UT-03 | ✅ Unitário | Código automático do lote | Produto cadastrado | Produto Arroz e Feijao Preto | Gerar códigos sequenciais no padrão `LT-PRODUTO-001` | 🔥 Alta | Sim |
-| UT-04 | ✅ Unitário | Filtros e ordenação de lotes | Lotes cadastrados | Código, status, validade, quantidade | Retornar apenas lotes compatíveis | 🔥 Alta | Sim |
 | UT-05 | ✅ Unitário | Cadastro de produto com peso | Inventário existente | Produto com 1kg e 500g | Armazenar peso internamente em gramas | 🔥 Alta | Sim |
-| UT-06 | ✅ Unitário | Filtros e validações de produto | Produtos cadastrados | Nome, categoria, marca, peso mínimo e máximo | Filtrar corretamente e validar erro de peso inválido | 🔥 Alta | Sim |
 | UT-07 | ✅ Unitário | Gerenciamento de inventários | Usuário autenticado | Criar, listar, editar e excluir inventário | Permitir CRUD e bloquear duplicidade | 🔥 Alta | Sim |
 | UT-08 | ✅ Unitário | Cadastro e proteção de usuário | Repositório de usuários | Usuário novo, duplicado e outro usuário | Criptografar senha e bloquear ações indevidas | 🔥 Alta | Sim |
 | UT-09 | ✅ Unitário | Alertas de validade | Lotes com datas diferentes | Lote vencido e lote do mês | Retornar alertas corretos por usuário | 🔥 Alta | Sim |
@@ -130,7 +127,6 @@
 | DT-04 | Produto em gramas | Produto com peso informado em gramas | Criar produto com `500g` | Banco MySQL local | Deve manter 500g |
 | DT-05 | Produto em kg | Produto com peso informado em kg | Criar produto com `1kg` | Banco MySQL local | Deve converter para 1000g |
 | DT-06 | Lote vencido | Lote com validade anterior à data atual | Criar lote com data passada | Banco MySQL local | Esperado: `EXPIRED` |
-| DT-07 | Lote próximo | Lote com validade em até 7 dias | Criar lote com validade próxima | Banco MySQL local | Esperado: `WARNING` |
 | DT-08 | Lote do mês | Lote com validade entre 8 e 30 dias | Criar lote com validade dentro do mês | Banco MySQL local | Esperado: `MONTH_WARNING` |
 | DT-09 | Lote normal | Lote com validade acima de 30 dias | Criar lote com validade futura | Banco MySQL local | Esperado: `OK` |
 | DT-10 | Lote sem validade | Lote sem data de validade | Criar lote com validade nula, se permitido | Banco MySQL local/teste unitário | Esperado: `UNKNOWN` |

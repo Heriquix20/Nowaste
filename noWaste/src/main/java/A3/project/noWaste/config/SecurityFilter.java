@@ -33,13 +33,13 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             if (optUser.isPresent()) {
                 JWTUserData userData = optUser.get();
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userData, null, null);
+                // Boa prática: passar as authorities vazias em vez de null se o usuário não tiver roles estruturadas ainda
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userData, null, java.util.Collections.emptyList());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            filterChain.doFilter(request, response);
         }
-        else {
-            filterChain.doFilter(request, response);
-        }
+
+        // O doFilter deve ser chamado apenas UMA vez ao final do método, independentemente do caminho
+        filterChain.doFilter(request, response);
     }
 }

@@ -3,6 +3,7 @@ package A3.project.noWaste.dto;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,9 @@ public class BatchDTO {
     private Integer id;
 
     private String code;
+
+    @Size(max = 20, message = "O código do lote do fornecedor deve ter no máximo 20 caracteres")
+    private String supplierBatchCode;
 
     @NotNull(message = "A quantidade não pode ser nula")
     @Min(value = 1, message = "A quantidade deve ser maior que zero")

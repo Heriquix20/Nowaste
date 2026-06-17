@@ -1,4 +1,4 @@
 package A3.project.noWaste.dto.responses;
 
-public record LoginResponse(String token) {
+public record LoginResponse(String token, String name, String email) {
 }
