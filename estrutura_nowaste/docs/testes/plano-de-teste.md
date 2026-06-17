@@ -98,7 +98,6 @@
 | UT-02 | ✅ Unitário | Dias restantes e peso total do lote | Produto relacionado ao lote | Peso 500g, quantidade 4, validade em 4 dias | Peso total 2000g e 4 dias restantes | 🔥 Alta | Sim |
 | UT-03 | ✅ Unitário | Código automático do lote | Produto cadastrado | Produto Arroz e Feijao Preto | Gerar códigos sequenciais no padrão `LT-PRODUTO-001` | 🔥 Alta | Sim |
 | UT-05 | ✅ Unitário | Cadastro de produto com peso | Inventário existente | Produto com 1kg e 500g | Armazenar peso internamente em gramas | 🔥 Alta | Sim |
-| UT-06 | ✅ Unitário | Filtros e validações de produto | Produtos cadastrados | Nome, categoria, marca, peso mínimo e máximo | Filtrar corretamente e validar erro de peso inválido | 🔥 Alta | Sim |
 | UT-07 | ✅ Unitário | Gerenciamento de inventários | Usuário autenticado | Criar, listar, editar e excluir inventário | Permitir CRUD e bloquear duplicidade | 🔥 Alta | Sim |
 | UT-08 | ✅ Unitário | Cadastro e proteção de usuário | Repositório de usuários | Usuário novo, duplicado e outro usuário | Criptografar senha e bloquear ações indevidas | 🔥 Alta | Sim |
 | UT-09 | ✅ Unitário | Alertas de validade | Lotes com datas diferentes | Lote vencido e lote do mês | Retornar alertas corretos por usuário | 🔥 Alta | Sim |
