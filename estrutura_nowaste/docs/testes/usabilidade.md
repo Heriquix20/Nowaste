@@ -1,4 +1,4 @@
-# 🧪✅ Template - Teste de Usabilidade — noWaste
+# 🧪✅ Teste de Usabilidade — noWaste
 
 Teste de usabilidade criado com base nos roteiros do projeto **noWaste**.  
 O teste foi planejado como **remoto**, **sem gravação**, usando apenas **formulário online**, **notas do observador** e **registros textuais de evidência**.
