@@ -159,7 +159,9 @@ Nowaste/
 │
 └── estrutura_nowaste/docs/          # Documentação do projeto
     ├── requisitos/
+    └── evidencias/
     └── testes/
+    └── slides/
 ```
 
 ---
