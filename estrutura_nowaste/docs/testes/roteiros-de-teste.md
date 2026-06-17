@@ -11,22 +11,27 @@
 | RT-03 | 🔥 Alta | Cadastro de inventário | Criar um inventário/estoque para organizar produtos. | Usuário autenticado no sistema. | Nome do inventário: Estoque Mercado | 1) Acessar o painel de inventários.<br>2) Selecionar opção de criar inventário.<br>3) Informar o nome “Estoque Mercado”.<br>4) Confirmar criação. | O inventário deve ser criado e aparecer na listagem do usuário autenticado. | EVID-03 — Print do painel de inventários + formulário do observador. |
 | RT-04 | ⚠️ Média | Listagem de inventários | Verificar se os inventários cadastrados aparecem corretamente. | Usuário autenticado e com pelo menos 1 inventário criado. | Inventário: Estoque Mercado | 1) Entrar no painel de inventários.<br>2) Verificar a listagem exibida.<br>3) Confirmar se o inventário criado aparece. | A lista deve exibir os inventários do usuário logado, sem mostrar dados de outros usuários. | EVID-04 — Print da listagem de inventários. |
 | RT-05 | 🔥 Alta | Cadastro de produto | Cadastrar um produto dentro de um inventário. | Usuário autenticado e inventário criado. | Produto: Leite Integral<br>Categoria: Laticínios<br>Marca: Italac<br>Peso: 1<br>Unidade: kg | 1) Abrir o inventário “Estoque Mercado”.<br>2) Selecionar opção de cadastrar produto.<br>3) Preencher nome, categoria, marca, peso e unidade.<br>4) Confirmar cadastro. | Produto cadastrado e listado no inventário. Peso em kg deve ser tratado corretamente pelo sistema. | EVID-05 — Registro em formulário + print/listagem do produto. |
-| RT-06 | 🔥 Alta | Cadastro de lote | Cadastrar lote de um produto com quantidade e validade. | Produto cadastrado dentro do inventário. | Produto: Leite Integral<br>Quantidade: 10<br>Validade: data próxima ao vencimento | 1) Abrir o produto “Leite Integral”.<br>2) Selecionar opção de lotes.<br>3) Cadastrar quantidade 10.<br>4) Informar data de validade próxima.<br>5) Confirmar cadastro. | Lote criado e vinculado ao produto. O sistema deve gerar código de lote automaticamente e calcular o status de validade. | EVID-07 — Nota do observador + print/modal de lote. |
-| RT-07 | 🔥 Alta | Status de validade do lote | Verificar se o sistema classifica corretamente lotes vencidos ou próximos do vencimento. | Produto com lote cadastrado e data de validade preenchida. | Lote vencido<br>Lote próximo do vencimento<br>Lote dentro da validade | 1) Cadastrar ou consultar lotes com datas diferentes.<br>2) Observar o status exibido.<br>3) Comparar com a data de validade. | Sistema deve indicar corretamente situações como vencido, vence em breve, vence no mês ou dentro da validade. | EVID-08 — Print/nota de consulta dos lotes. |
-| RT-08 | 🔥 Alta | Alertas de validade | Localizar alertas de lotes vencidos ou próximos do vencimento. | Usuário autenticado, inventário, produto e lote cadastrados. | Lote de Leite Integral vencendo no mês atual. | 1) Acessar área de alertas ou dashboard.<br>2) Consultar alertas de validade.<br>3) Verificar lotes vencidos e próximos do vencimento. | Sistema deve exibir alertas de validade de forma compreensível para o usuário. | EVID-09 — Print da tela de alertas + comentário do participante. |
-| RT-09 | ⚠️ Média | Fluxo completo do sistema | Validar o caminho principal do noWaste do início ao fim. | Frontend e backend funcionando. | Usuário novo, inventário, produto e lote com validade próxima. | 1) Cadastrar usuário.<br>2) Fazer login.<br>3) Criar inventário.<br>4) Cadastrar produto.<br>5) Cadastrar lote.<br>6) Verificar alertas. | O usuário deve conseguir completar o fluxo **Usuário → Inventário → Produto → Lote → Alertas** sem bloqueios críticos. | EVID-10 — Checklist final do roteiro + notas do observador. |
+| RT-07 | 🔥 Alta | Cadastro de lote | Cadastrar lote de um produto com quantidade e validade. | Produto cadastrado dentro do inventário. | Produto: Leite Integral<br>Quantidade: 10<br>Validade: data próxima ao vencimento | 1) Abrir o produto “Leite Integral”.<br>2) Selecionar opção de lotes.<br>3) Cadastrar quantidade 10.<br>4) Informar data de validade próxima.<br>5) Confirmar cadastro. | Lote criado e vinculado ao produto. O sistema deve gerar código de lote automaticamente e calcular o status de validade. | EVID-07 — Nota do observador + print/modal de lote. |
+| RT-08 | 🔥 Alta | Status de validade do lote | Verificar se o sistema classifica corretamente lotes vencidos ou próximos do vencimento. | Produto com lote cadastrado e data de validade preenchida. | Lote vencido<br>Lote próximo do vencimento<br>Lote dentro da validade | 1) Cadastrar ou consultar lotes com datas diferentes.<br>2) Observar o status exibido.<br>3) Comparar com a data de validade. | Sistema deve indicar corretamente situações como vencido, vence em breve, vence no mês ou dentro da validade. | EVID-08 — Print/nota de consulta dos lotes. |
+| RT-09 | 🔥 Alta | Alertas de validade | Localizar alertas de lotes vencidos ou próximos do vencimento. | Usuário autenticado, inventário, produto e lote cadastrados. | Lote de Leite Integral vencendo no mês atual. | 1) Acessar área de alertas ou dashboard.<br>2) Consultar alertas de validade.<br>3) Verificar lotes vencidos e próximos do vencimento. | Sistema deve exibir alertas de validade de forma compreensível para o usuário. | EVID-09 — Print da tela de alertas + comentário do participante. |
+| RT-10 | ⚠️ Média | Fluxo completo do sistema | Validar o caminho principal do noWaste do início ao fim. | Frontend e backend funcionando. | Usuário novo, inventário, produto e lote com validade próxima. | 1) Cadastrar usuário.<br>2) Fazer login.<br>3) Criar inventário.<br>4) Cadastrar produto.<br>5) Cadastrar lote.<br>6) Verificar alertas. | O usuário deve conseguir completar o fluxo **Usuário → Inventário → Produto → Lote → Alertas** sem bloqueios críticos. | EVID-10 — Checklist final do roteiro + notas do observador. |
 
 ---
 
-## 📎 Evidências
+## 📎 Evidências do roteiro
 
-| Evidência | Descrição | Registro |
+| Evidência | Descrição | Link/Registro |
 |---|---|---|
-| EVID-01 | Registro manual do cadastro de produto | Formulário remoto + nota do observador |
-| EVID-02 | Registro manual do filtro de produtos | Formulário remoto + nota do observador |
-| EVID-03 | Registro manual do cadastro de lote | Formulário remoto + nota do observador |
-| EVID-04 | Validação de status de lote | Notas do observador + resultado esperado do sistema |
-| EVID-05 | Checklist do fluxo completo | Formulário final do teste de usabilidade |
+| EVID-01 | Tela de cadastro do frontend | https://github.com/user-attachments/assets/1c0cfea1-6d83-4cb6-b8a3-e0baf94ab63d |
+| EVID-02 | Tela de login do frontend | https://github.com/user-attachments/assets/811ad0bc-5ff5-4a45-8aa2-e048a5b06f16 |
+| EVID-03 | Painel/listagem de inventários | https://github.com/user-attachments/assets/bbcc88c6-fa64-45e4-aeeb-a51eebe4a723 |
+| EVID-04 | Consulta de inventários via API | https://github.com/user-attachments/assets/13791de3-5d5f-4938-aa7b-66f798bdd040 |
+| EVID-05 | Registro manual do cadastro de produto | Formulário remoto + nota do observador |
+| EVID-06 | Registro manual do filtro de produtos | Formulário remoto + nota do observador |
+| EVID-07 | Registro manual do cadastro de lote | Formulário remoto + nota do observador |
+| EVID-08 | Validação de status de lote | Notas do observador + resultado esperado do sistema |
+| EVID-09 | Tela de alertas de validade | https://github.com/user-attachments/assets/490404fa-d6e3-4455-b07e-7b4f1f9abf5e |
+| EVID-10 | Checklist do fluxo completo | Formulário final do teste de usabilidade |
 
 ---
 
